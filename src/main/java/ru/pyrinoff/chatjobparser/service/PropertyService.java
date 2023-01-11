@@ -35,39 +35,6 @@ public class PropertyService {
     @Value("#{'database.format_sql'}")
     private @NotNull String databaseFormatSql;
 
-
-    @NotNull
-    @Value("#{environment['server.host']}")
-    private String serverHost;
-
-    @NotNull
-    @Value("#{environment['server.port']}")
-    private Integer serverPort;
-
-    @NotNull
-    @Value("#{environment['admin.login']}")
-    private String adminLogin;
-
-    @NotNull
-    @Value("#{environment['admin.password']}")
-    private String adminPassword;
-
-    @NotNull
-    @Value("#{environment['password.secret']}")
-    private String passwordSecret;
-
-    @NotNull
-    @Value("#{environment['password.iteration']}")
-    private Integer passwordIteration;
-
-    @NotNull
-    @Value("#{environment['session.key']}")
-    private String sessionKey;
-
-    @NotNull
-    @Value("#{environment['session.timeout']}")
-    private Integer sessionTimeout;
-
     @NotNull
     @Value("#{environment['database.cache.use_second_level_cache']}")
     private String cacheUseSecondLevelCache;
