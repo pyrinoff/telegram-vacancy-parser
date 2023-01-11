@@ -11,13 +11,15 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import ru.pyrinoff.chatjobparser.service.PropertyService;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan("ru.pyrinoff.jobparser")
+@ComponentScan("ru.pyrinoff.chatjobparser")
+@EnableTransactionManagement
 public class ApplicationConfiguration {
 
     @Autowired
@@ -48,18 +50,18 @@ public class ApplicationConfiguration {
         @NotNull final LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(dataSource);
         factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        factoryBean.setPackagesToScan("ru.pyrinoff.jobparser.model");
+        factoryBean.setPackagesToScan("ru.pyrinoff.chatjobparser");
         @NotNull final Properties properties = new Properties();
         properties.put(Environment.DIALECT, propertyService.getDatabaseDialect());
         properties.put(Environment.HBM2DDL_AUTO, propertyService.getDatabaseHbm2ddlAuto());
         properties.put(Environment.SHOW_SQL, propertyService.getDatabaseShowSql());
-//        properties.put(Environment.FORMAT_SQL, propertyService.getDBFormatSql());
-//        properties.put(Environment.USE_SECOND_LEVEL_CACHE, propertyService.getDBSecondLvlCache());
-//        properties.put(Environment.CACHE_REGION_FACTORY, propertyService.getDBFactoryClass());
-//        properties.put(Environment.USE_QUERY_CACHE, propertyService.getDBUseQueryCache());
-//        properties.put(Environment.USE_MINIMAL_PUTS, propertyService.getDBUseMinPuts());
-//        properties.put(Environment.CACHE_REGION_PREFIX, propertyService.getDBRegionPrefix());
-//        properties.put(Environment.CACHE_PROVIDER_CONFIG, propertyService.getDBConfigFilePath());
+        properties.put(Environment.FORMAT_SQL, propertyService.getDatabaseFormatSql());
+        properties.put(Environment.USE_SECOND_LEVEL_CACHE, propertyService.getCacheUseSecondLevelCache());
+        properties.put(Environment.CACHE_REGION_FACTORY, propertyService.getCacheRegionFactoryClass());
+        properties.put(Environment.USE_QUERY_CACHE, propertyService.getCacheUseQueryCache());
+        properties.put(Environment.USE_MINIMAL_PUTS, propertyService.getCacheUseMinimalPuts());
+        properties.put(Environment.CACHE_REGION_PREFIX, propertyService.getCacheRegionPrefix());
+        properties.put(Environment.CACHE_PROVIDER_CONFIG, propertyService.getCacheProviderConfigurationFile());
         factoryBean.setJpaProperties(properties);
         return factoryBean;
     }
