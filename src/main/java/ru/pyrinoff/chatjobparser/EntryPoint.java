@@ -1,8 +1,8 @@
-package ru.pyrinoff.chatjobparser.component;
+package ru.pyrinoff.chatjobparser;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.pyrinoff.chatjobparser.MainApplication;
+import ru.pyrinoff.chatjobparser.component.MainApplication;
 import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
 
 public class EntryPoint {

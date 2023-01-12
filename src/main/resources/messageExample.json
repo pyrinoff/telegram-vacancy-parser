@@ -1,0 +1,72 @@
+{
+  "id": 19647,
+  "type": "message",
+  "date": "2017-08-22T15:17:31",
+  "date_unixtime": "1503404251",
+  "from": "HashTag",
+  "from_id": "user185955757",
+  "text": [
+    {
+      "type": "text_link",
+      "text": "Подписка на #офис",
+      "href": "http://telegram.me/hash_tag_bot?start=58c1042da243282c171a20b1"
+    },
+    "\n",
+    {
+      "type": "text_link",
+      "text": "Подписка на #ип",
+      "href": "http://telegram.me/hash_tag_bot?start=599c20db6b1bc7705b1b7614"
+    },
+    "\n",
+    {
+      "type": "text_link",
+      "text": "Подписка на #fulltime",
+      "href": "http://telegram.me/hash_tag_bot?start=58c294afa243282c171a20d4"
+    },
+    "\n",
+    {
+      "type": "text_link",
+      "text": "Подписка на #qa_enqineer",
+      "href": "http://telegram.me/hash_tag_bot?start=599c20db6b1bc7705b1b7615"
+    },
+    ""
+  ],
+  "text_entities": [
+    {
+      "type": "text_link",
+      "text": "Подписка на #офис",
+      "href": "http://telegram.me/hash_tag_bot?start=58c1042da243282c171a20b1"
+    },
+    {
+      "type": "plain",
+      "text": "\n"
+    },
+    {
+      "type": "text_link",
+      "text": "Подписка на #ип",
+      "href": "http://telegram.me/hash_tag_bot?start=599c20db6b1bc7705b1b7614"
+    },
+    {
+      "type": "plain",
+      "text": "\n"
+    },
+    {
+      "type": "text_link",
+      "text": "Подписка на #fulltime",
+      "href": "http://telegram.me/hash_tag_bot?start=58c294afa243282c171a20d4"
+    },
+    {
+      "type": "plain",
+      "text": "\n"
+    },
+    {
+      "type": "text_link",
+      "text": "Подписка на #qa_enqineer",
+      "href": "http://telegram.me/hash_tag_bot?start=599c20db6b1bc7705b1b7615"
+    },
+    {
+      "type": "plain",
+      "text": ""
+    }
+  ]
+}

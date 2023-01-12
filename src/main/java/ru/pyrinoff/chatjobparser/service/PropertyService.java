@@ -20,51 +20,43 @@ public class PropertyService {
     @Value("#{environment['database.password']}")
     private @NotNull String databasePassword;
 
-    @Value("${'database.driver'}")
+    @Value("#{environment['database.driver']}")
     private @NotNull String databaseDriver;
 
-    @Value("#{'database.dialect'}")
+    @Value("#{environment['database.dialect']}")
     private @NotNull String databaseDialect;
 
-    @Value("#{'database.hbm2ddl_auto'}")
+    @Value("#{environment['database.hbm2ddl_auto']}")
     private @NotNull String databaseHbm2ddlAuto;
 
-    @Value("#{'database.show_sql'}")
+    @Value("#{environment['database.show_sql']}")
     private @NotNull String databaseShowSql;
 
-    @Value("#{'database.format_sql'}")
+    @Value("#{environment['database.format_sql']}")
     private @NotNull String databaseFormatSql;
 
-    @NotNull
     @Value("#{environment['database.cache.use_second_level_cache']}")
-    private String cacheUseSecondLevelCache;
+    private @NotNull String cacheUseSecondLevelCache;
 
-    @NotNull
     @Value("#{environment['database.cache.use_query_cache']}")
-    private String cacheUseQueryCache;
+    private @NotNull String cacheUseQueryCache;
 
-    @NotNull
     @Value("#{environment['database.cache.use_minimal_puts']}")
-    private String cacheUseMinimalPuts;
+    private @NotNull String cacheUseMinimalPuts;
 
-    @NotNull
     @Value("#{environment['database.cache.region_prefix']}")
-    private String cacheRegionPrefix;
+    private @NotNull String cacheRegionPrefix;
 
-    @NotNull
     @Value("#{environment['database.cache.provider_configuration_file_resource_path']}")
-    private String cacheProviderConfigurationFile;
+    private @NotNull String cacheProviderConfigurationFile;
 
-    @NotNull
     @Value("#{environment['database.cache.region.factory_class']}")
-    private String cacheRegionFactoryClass;
+    private @NotNull String cacheRegionFactoryClass;
 
-    @NotNull
-    @Value("#{environment['database.cache.admin_protection_token']}")
-    private String databaseAdminProtectionToken;
+    @Value("#{environment['database.admin_protection_token']}")
+    private @NotNull String databaseAdminProtectionToken;
 
-    @NotNull
     @Value("#{environment['liquibase.outputChangeLogFile']}")
-    private String liquibaseChangelogFile;
+    private @NotNull String liquibaseChangelogFile;
 
 }
