@@ -6,10 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.annotation.processing.Generated;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
@@ -86,9 +83,9 @@ public class Message {
     @JsonProperty("height")
     public Integer height;
 
+    @JsonIgnore
     @JsonProperty("text")
-    @JsonDeserialize(using = ListTextDeserializer.class)
-    public List<Text> text;
+    public String text;
 
     @JsonProperty("text_entities")
     public List<TextEntity> textEntities = new ArrayList<TextEntity>();

@@ -4,24 +4,152 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.pyrinoff.chatjobparser.model.telegram.ChatExportJson;
+import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.exception.service.parser.MessageDateEmpty;
+import ru.pyrinoff.chatjobparser.exception.service.parser.ParsedTextEmpty;
+import ru.pyrinoff.chatjobparser.exception.service.parser.VacancyNotCorrect;
+import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
+import ru.pyrinoff.chatjobparser.model.telegram.*;
+import ru.pyrinoff.chatjobparser.parser.salary.AbstractParser;
+import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
 import ru.pyrinoff.chatjobparser.util.FileUtils;
 import ru.pyrinoff.chatjobparser.util.JsonUtil;
+import ru.pyrinoff.chatjobparser.util.RegexUtils;
+
+import javax.annotation.PostConstruct;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Service
 public class ParserService {
 
+    @Autowired
+    private @NotNull VacancyService vacancyService;
+
+    @Autowired
+    private @NotNull List<AbstractParser> salaryParserList;
+
+    private @Nullable ChatExportJson chatExportJson;
+
+    @PostConstruct
+    private void postLoad() {
+        System.out.println("Parsers: ");
+        salaryParserList.forEach(System.out::println);
+        System.out.println("Parsers end");
+    }
+
     @SneakyThrows
-    public void parseFile(String chatExportJsonFilepath) {
+    public @Nullable void parseSalary(@NotNull final String text, @NotNull final Vacancy vacancy) {
+        @Nullable SalaryParserResult salaryParserResult = null;
+
+        for(@NotNull final AbstractParser oneSalaryParser : salaryParserList) {
+            salaryParserResult = oneSalaryParser.parse(text);
+            if(salaryParserResult != null) break;
+        }
+
+        if(salaryParserResult == null) throw new VacancyNotCorrect("Cant parse salary!");
+
+        vacancy.setSalaryFrom(salaryParserResult.getFrom());
+        vacancy.setSalaryTo(salaryParserResult.getTo());
+        vacancy.setCurrency(salaryParserResult.getCurrencyEnum());
+    }
+
+    @SneakyThrows
+    public void parseFileToMemory(String chatExportJsonFilepath) {
         final @Nullable String fileContent = FileUtils.fileGetContentAsString(chatExportJsonFilepath);
         if (fileContent == null) throw new RuntimeException("No content in json file: " + chatExportJsonFilepath);
-        @NotNull final ChatExportJson chatExportJson =
-                JsonUtil.jsonToObject(fileContent, ChatExportJson.class);
-        System.out.println(chatExportJson.getMessages().get(0));
+        chatExportJson = JsonUtil.jsonToObject(fileContent, ChatExportJson.class);
     }
+
+    public void filterById(@NotNull final Integer messageId) {
+        @NotNull final List<Message> newList = chatExportJson.getMessages().stream().filter(oneMessage -> messageId.equals(oneMessage.getId())).collect(Collectors.toList());
+        System.out.println(newList.size());
+        System.out.println("--------");
+        chatExportJson.setMessages(newList);
+    }
+
+    @SneakyThrows
+    public void parseVacancies() {
+        System.out.println("Starting parse vacancies");
+        if (chatExportJson == null)
+            throw new Exception("Chat history not loaded to memory! Use parseFileToMemory() first!");
+        int stored = 0;
+        int index = 0;
+        for (Message oneTelegramMessage : chatExportJson.getMessages()) {
+            index++;
+            try {
+                @Nullable Vacancy vacancy = parseMessageToVacancy(oneTelegramMessage);
+                System.out.println("PARSED SUCCESSFULLY: "+vacancy.getSalaryFrom()+"-"+vacancy.getSalaryTo()+" "+vacancy.getCurrency());
+                //vacancyService.add(vacancy);
+                stored++;
+            } catch (@NotNull final Exception e) {
+                if (e instanceof VacancyNotCorrect) {
+                    System.out.println("Skip message #" + oneTelegramMessage.getId());
+                    continue;
+                }
+                System.out.println("Exception during parse message #" + index);
+                e.printStackTrace();
+                //if (true) break;
+                continue;
+            }
+        }
+        System.out.println("Parsing ended, processed: " + index + ", stored: " + stored);
+    }
+
+    @SneakyThrows
+    private @NotNull Vacancy parseMessageToVacancy(Message message) {
+        @NotNull final Vacancy vacancy = new Vacancy();
+        parseDate(message, vacancy);
+        @Nullable String text = parseText(message);
+        System.out.println("TEXT: " + text);
+        parseSalary(text, vacancy);
+        if (vacancy.getSalaryFrom() == null && vacancy.getSalaryTo() == null)
+            throw new VacancyNotCorrect("Cant parse vacancy salary!");
+        System.out.println("Salary parsed, from: " + vacancy.getSalaryFrom() + ", to: " + vacancy.getSalaryTo() + ", currency: " + vacancy.getCurrency());
+        return vacancy;
+    }
+
+    private @Nullable String getCleanTextFromTextList(List<TextEntity> textList) {
+        if (textList == null || textList.isEmpty()) return null;
+        StringBuilder sb = new StringBuilder();
+        for (@NotNull final TextEntity oneText : textList) {
+            //if(TextTypeEnum.valueOf(oneText.getType()) == TextTypeEnum.MENTION) continue;
+            sb.append(oneText.getText());
+        }
+        if (sb.isEmpty()) return null;
+        return cleanupText(sb.toString());
+    }
+
+    private @Nullable String cleanupText(@NotNull String dirtyString) {
+        dirtyString = dirtyString.replaceAll(",|$|\r|\n|\\+|\\(|\\)}", " ");//v1 (positive)
+        //        dirtyString = dirtyString.replaceAll("[^\\w:\\/@#-]", " "); //v2 negative not working on cyrillic
+        dirtyString = dirtyString.replaceAll(": ", " ");
+        dirtyString = dirtyString.replaceAll(" :", " ");
+        dirtyString = dirtyString.replaceAll("- ", " ");
+        dirtyString = dirtyString.replaceAll(" -", " ");
+        dirtyString = dirtyString.replaceAll("\s{2,}+", " ");
+
+        dirtyString = dirtyString.toLowerCase();
+        return dirtyString;
+    }
+
+    private @Nullable void parseDate(@NotNull final Message message, @NotNull final Vacancy vacancy) {
+        @Nullable Date date = Date.from(Instant.ofEpochSecond(Long.parseLong(message.getDateUnixtime())));
+        if (date == null) throw new MessageDateEmpty();
+        vacancy.setDate(date);
+    }
+
+    private @Nullable String parseText(@NotNull Message message) {
+        @Nullable String text = getCleanTextFromTextList(message.getTextEntities());
+        if (text == null) throw new ParsedTextEmpty();
+        return text;
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package ru.pyrinoff.chatjobparser.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -11,7 +12,35 @@ import java.util.regex.Pattern;
 
 public interface RegexUtils {
 
-    static Map<Integer, List<String>> getMatches(String sourceString, String patternString) {
+    /**
+     *
+     * @param sourceString - text to search in
+     * @param patternString - regex pattern
+     * @return Map like [0 => ["Group1", "Group2"]], where 0 - match #0
+     */
+    static @Nullable Map<Integer, List<String>> getMatches(String sourceString, String patternString) {
+        Map<Integer, List<String>> resultMatches = new HashMap<>();
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(sourceString);
+        int matchIndex = 0;
+        while(matcher.find()) {
+            @NotNull final List<String> oneMatchOfPattern = new ArrayList<>();
+            for(int i=0;i<=matcher.groupCount();i++) {
+                oneMatchOfPattern.add(matcher.group(i)); //помещаем в один лист обьекты с одного совпадения
+            }
+            resultMatches.put(matchIndex, oneMatchOfPattern); //помещаем совпадение в мапу
+            matchIndex++;
+        }
+        if(resultMatches.size()==0) return null;
+        return resultMatches;
+    }
+    /**
+     *
+     * @param sourceString - text to search in
+     * @param patternString - regex pattern
+     * @return Map like [0 => ["Group1ForMatch1", "Group2ForMatch2"]], where 0 - group #0
+     */
+    static @Nullable Map<Integer, List<String>> getMatchesOld(String sourceString, String patternString) {
         Map<Integer, List<String>> resultMatches = new HashMap<>();
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(sourceString);
@@ -25,13 +54,13 @@ public interface RegexUtils {
         return resultMatches;
     }
 
-    public static  List<String> getFirstFound(String contents, String regex) {
+    static @Nullable List<String> getFirstFound(String contents, String regex) {
         List<List<String>> founds = getFound(contents, regex, 1);
         if(founds.size()<1) return null;
         return founds.get(0);
     }
 
-    public static List<List<String>> getFound(String contents, String regex, @Nullable Integer limit) {
+    static @Nullable List<List<String>> getFound(String contents, String regex, @Nullable Integer limit) {
         if (isEmpty(regex) || isEmpty(contents)) {
             return null;
         }
@@ -51,7 +80,7 @@ public interface RegexUtils {
         return results;
     }
 
-    public static boolean isEmpty(String str) {
+    static boolean isEmpty(String str) {
         if (str != null && str.trim().length() > 0) {
             return false;
         }

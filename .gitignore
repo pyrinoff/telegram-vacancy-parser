@@ -99,4 +99,4 @@ backup.yaml
 deploy/
 .allure/
 activemq-data/
-chatExport.json
+./*.json

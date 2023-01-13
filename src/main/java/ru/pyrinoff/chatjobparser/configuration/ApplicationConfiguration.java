@@ -50,7 +50,7 @@ public class ApplicationConfiguration {
         @NotNull final LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(dataSource);
         factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        factoryBean.setPackagesToScan("ru.pyrinoff.chatjobparser");
+        factoryBean.setPackagesToScan("ru.pyrinoff.chatjobparser.model");
         @NotNull final Properties properties = new Properties();
         properties.put(Environment.DIALECT, propertyService.getDatabaseDialect());
         properties.put(Environment.HBM2DDL_AUTO, propertyService.getDatabaseHbm2ddlAuto());
