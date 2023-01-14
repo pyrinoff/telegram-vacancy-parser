@@ -16,8 +16,9 @@ import java.util.Map;
 @Order(10)
 @Component
 public class ParserFromToPrecise extends AbstractParser {
-
-    public static @NotNull String PATTERN = "(от){0,1}[\\s]{0,1}([\\d]{1}[\\d \\.]{1,6})(к|k|тыс\\.|тыс|т\\.р\\.|тр){0,1}[\\s]{0,1}(\\$|USD|руб|р|р\\.|rub){0,1}[\\s]{0,1}(до|-|–| )[\\s]{0,1}([\\d]{1}[\\d \\.]{1,6})(к|k|тыс\\.|тыс|т\\.р\\.|тр){0,1}[\\s]{0,1}(\\$|USD|руб|р|р\\.|rub){0,1}";
+    //[\d \.]{1,7}
+    public static @NotNull String PATTERN = "(от){0,1}"+CAN_BE_WHITESPACE+PATTERN_PART_ONE_BORDER+CAN_BE_WHITESPACE+PATTERN_PART_K+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ+CAN_BE_WHITESPACE
+            +"(до|-|–| |—)"+CAN_BE_WHITESPACE+PATTERN_PART_ONE_BORDER+CAN_BE_WHITESPACE+PATTERN_PART_K+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ;
 
     @Override public @Nullable SalaryParserResult parse(@NotNull String text) {
         if(DEBUG) System.out.println("Parser: " + super.getClass().getSimpleName());
@@ -61,7 +62,6 @@ public class ParserFromToPrecise extends AbstractParser {
             @Nullable final String currencyString = currencyFrom != null ? currencyFrom : currencyTo != null ? currencyTo : null;
             final boolean isK = (thousandFrom != null && !thousandFrom.isEmpty() || thousandTo != null && !thousandTo.isEmpty());
             @Nullable final CurrencyEnum currency = getCurrencyByString(currencyString);
-            final boolean hasDotInValue = valueFromString.contains(".") || valueToString.contains(".");
 
             int valueFromInt = isK ? valueFrom * 1000 : valueFrom;
             int valueToInt = isK ? valueTo * 1000 : valueTo;
@@ -69,7 +69,6 @@ public class ParserFromToPrecise extends AbstractParser {
             salaryParserResult.setCurrencyEnum(currency);
             salaryParserResult.setFrom(valueFromInt);
             salaryParserResult.setTo(valueToInt);
-            salaryParserResult.setHasDotInValue(hasDotInValue);
 
             if(currency != null) {
                 if(!isSalaryLooksNormal(currency, valueFromInt) || !isSalaryLooksNormal(currency, valueToInt)) {
@@ -83,6 +82,10 @@ public class ParserFromToPrecise extends AbstractParser {
 
         if(preciseByCurrency) return null;
         return predictCurrency(salaryParserResultList);
+    }
+
+    @Override public String toString() {
+        return this.getClass().getSimpleName() + ", PATTERN " + PATTERN;
     }
 
 }

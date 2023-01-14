@@ -15,6 +15,4 @@ public class SalaryParserResult {
 
     private @Nullable CurrencyEnum currencyEnum;
 
-    private boolean hasDotInValue;
-
 }

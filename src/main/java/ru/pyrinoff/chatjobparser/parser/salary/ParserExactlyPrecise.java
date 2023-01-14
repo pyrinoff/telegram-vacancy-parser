@@ -17,8 +17,8 @@ import java.util.Map;
 @Component
 public class ParserExactlyPrecise extends AbstractParser {
 
-    public static @NotNull String PATTERN = "[\\s]{0,1}(\\$|USD|руб|р|р\\.|rub){0,1}([\\d]{1}[\\d ]{1,6})(к|k|тыс\\.|тыс|т\\.р\\.|тр){0,1}[\\s]{0,1}(\\$|USD|руб|р|р\\.|rub){1}[\\s]{0,1}";
-    public static @NotNull String PATTERN_NON_PRECISE = "[\\s]{0,1}(\\$|USD|руб|р|р\\.|rub){0,1}([\\d]{1}[\\d ]{1,6})(к|k|тыс\\.|тыс|т\\.р\\.|тр){0,1}[\\s]{0,1}(\\$|USD|руб|р|р\\.|rub|net){1}[\\s]{0,1}";
+    public static @NotNull String PATTERN = CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ+PATTERN_PART_ONE_BORDER+CAN_BE_WHITESPACE+PATTERN_PART_K+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_REQ;
+    public static @NotNull String PATTERN_NON_PRECISE = CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ+PATTERN_PART_ONE_BORDER+CAN_BE_WHITESPACE+PATTERN_PART_K+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_OR_WORD_REQ;
 
     @Override public @Nullable SalaryParserResult parse(@NotNull String text) {
         if(DEBUG) System.out.println("Parser: " + this.getClass().getSimpleName());
@@ -51,14 +51,12 @@ public class ParserExactlyPrecise extends AbstractParser {
             final boolean isK = thousand != null && !thousand.isEmpty();
             final @Nullable String currencyString = currencyOne != null ? currencyOne : currencyTwo;
             @Nullable final CurrencyEnum currency = getCurrencyByString(currencyString);
-            final boolean hasDotInValue = valueString.contains(".") || valueString.contains(".");
 
             final int valueInt = isK ? value * 1000 : value;
 
             salaryParserResult.setCurrencyEnum(currency);
             salaryParserResult.setFrom(valueInt);
             salaryParserResult.setTo(valueInt);
-            salaryParserResult.setHasDotInValue(hasDotInValue);
 
             if(currency != null) {
                 if(!isSalaryLooksNormal(currency, valueInt)) {
@@ -73,6 +71,10 @@ public class ParserExactlyPrecise extends AbstractParser {
         if(preciseByCurrency) return null;
         return predictCurrency(salaryParserResultList);
 
+    }
+
+    @Override public String toString() {
+        return this.getClass().getSimpleName() + ", PATTERN " + PATTERN+"\nPATTERN_NON_PRECISE: "+PATTERN_NON_PRECISE;
     }
 
 }

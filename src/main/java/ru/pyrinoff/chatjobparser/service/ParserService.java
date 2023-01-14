@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageDateEmpty;
+import ru.pyrinoff.chatjobparser.exception.service.parser.MessageTooSmall;
 import ru.pyrinoff.chatjobparser.exception.service.parser.ParsedTextEmpty;
 import ru.pyrinoff.chatjobparser.exception.service.parser.VacancyNotCorrect;
 import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
@@ -16,13 +16,11 @@ import ru.pyrinoff.chatjobparser.parser.salary.AbstractParser;
 import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
 import ru.pyrinoff.chatjobparser.util.FileUtils;
 import ru.pyrinoff.chatjobparser.util.JsonUtil;
-import ru.pyrinoff.chatjobparser.util.RegexUtils;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -37,6 +35,8 @@ public class ParserService {
 
     private @Nullable ChatExportJson chatExportJson;
 
+    private final int MIN_VACANCY_TEXT_LENGTH = 250;
+
     @PostConstruct
     private void postLoad() {
         System.out.println("Parsers: ");
@@ -47,6 +47,7 @@ public class ParserService {
     @SneakyThrows
     public @Nullable void parseSalary(@NotNull final String text, @NotNull final Vacancy vacancy) {
         @Nullable SalaryParserResult salaryParserResult = null;
+        if(AbstractParser.DEBUG) System.out.println("Text: "+text);
 
         for(@NotNull final AbstractParser oneSalaryParser : salaryParserList) {
             salaryParserResult = oneSalaryParser.parse(text);
@@ -85,12 +86,13 @@ public class ParserService {
             index++;
             try {
                 @Nullable Vacancy vacancy = parseMessageToVacancy(oneTelegramMessage);
-                System.out.println("PARSED SUCCESSFULLY: "+vacancy.getSalaryFrom()+"-"+vacancy.getSalaryTo()+" "+vacancy.getCurrency());
+                System.out.println("PARSED SUCCESSFULLY, id: "+ oneTelegramMessage.getId() +", result: "+vacancy.getSalaryFrom()+"-"+vacancy.getSalaryTo()+" "+vacancy.getCurrency());
                 //vacancyService.add(vacancy);
                 stored++;
             } catch (@NotNull final Exception e) {
+                if (e instanceof MessageTooSmall) continue;
                 if (e instanceof VacancyNotCorrect) {
-                    System.out.println("Skip message #" + oneTelegramMessage.getId());
+                    System.out.println("SKIP MESSAGE #" + oneTelegramMessage.getId());
                     continue;
                 }
                 System.out.println("Exception during parse message #" + index);
@@ -106,7 +108,8 @@ public class ParserService {
     private @NotNull Vacancy parseMessageToVacancy(Message message) {
         @NotNull final Vacancy vacancy = new Vacancy();
         parseDate(message, vacancy);
-        @Nullable String text = parseText(message);
+        @Nullable String text = cleanupText(parseText(message));
+        if(text == null || text.length() < MIN_VACANCY_TEXT_LENGTH) throw new MessageTooSmall();
         System.out.println("TEXT: " + text);
         parseSalary(text, vacancy);
         if (vacancy.getSalaryFrom() == null && vacancy.getSalaryTo() == null)
@@ -115,7 +118,7 @@ public class ParserService {
         return vacancy;
     }
 
-    private @Nullable String getCleanTextFromTextList(List<TextEntity> textList) {
+    private @Nullable String getTextFromTextList(List<TextEntity> textList) {
         if (textList == null || textList.isEmpty()) return null;
         StringBuilder sb = new StringBuilder();
         for (@NotNull final TextEntity oneText : textList) {
@@ -123,19 +126,19 @@ public class ParserService {
             sb.append(oneText.getText());
         }
         if (sb.isEmpty()) return null;
-        return cleanupText(sb.toString());
+        return sb.toString();
     }
 
-    private @Nullable String cleanupText(@NotNull String dirtyString) {
+    public static @Nullable String cleanupText(@NotNull String dirtyString) {
         dirtyString = dirtyString.replaceAll(",|$|\r|\n|\\+|\\(|\\)}", " ");//v1 (positive)
         //        dirtyString = dirtyString.replaceAll("[^\\w:\\/@#-]", " "); //v2 negative not working on cyrillic
         dirtyString = dirtyString.replaceAll(": ", " ");
         dirtyString = dirtyString.replaceAll(" :", " ");
         dirtyString = dirtyString.replaceAll("- ", " ");
         dirtyString = dirtyString.replaceAll(" -", " ");
+        dirtyString = dirtyString.replaceAll("(\\d)[ \\.]{1,2}000", "$1000");
         dirtyString = dirtyString.replaceAll("\s{2,}+", " ");
-
-        dirtyString = dirtyString.toLowerCase();
+        dirtyString = dirtyString.trim().toLowerCase();
         return dirtyString;
     }
 
@@ -146,7 +149,7 @@ public class ParserService {
     }
 
     private @Nullable String parseText(@NotNull Message message) {
-        @Nullable String text = getCleanTextFromTextList(message.getTextEntities());
+        @Nullable String text = getTextFromTextList(message.getTextEntities());
         if (text == null) throw new ParsedTextEmpty();
         return text;
     }

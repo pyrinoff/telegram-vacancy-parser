@@ -18,7 +18,7 @@ import java.util.Map;
 public class ParserFromToNonPrecise extends AbstractParser {
 
     @Override public @Nullable SalaryParserResult parse(@NotNull String text) {
-        System.out.println("Parser: " + super.getClass().getSimpleName());
+        if(DEBUG) System.out.println("Parser: " + super.getClass().getSimpleName());
         return ParserFromToPrecise.parseMethod(text, false);
     }
 

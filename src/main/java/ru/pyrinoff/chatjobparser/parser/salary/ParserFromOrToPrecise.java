@@ -17,7 +17,7 @@ import java.util.Map;
 @Component
 public class ParserFromOrToPrecise extends AbstractParser {
 
-    public static @NotNull String PATTERN = "(от|до){1}[\\s]{0,1}(\\$|USD|руб|р|р\\.|rub){0,1}([\\d]{1}[\\d ]{1,6})(к|k|тыс\\.|тыс|т\\.р\\.|тр){0,1}[\\s]{0,1}(\\$|USD|руб|р|р\\.|rub){0,1}[\\s]{0,1}";
+    public static @NotNull String PATTERN = "(от|до){1}"+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ+PATTERN_PART_ONE_BORDER+CAN_BE_WHITESPACE+PATTERN_PART_K+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ;
 
     @Override public @Nullable SalaryParserResult parse(@NotNull String text) {
         if(DEBUG) System.out.println("Parser: " + this.getClass().getSimpleName());
@@ -65,7 +65,6 @@ public class ParserFromOrToPrecise extends AbstractParser {
             salaryParserResult.setCurrencyEnum(currency);
             if(isFrom) salaryParserResult.setFrom(valueInt);
             if(isTo) salaryParserResult.setTo(valueInt);
-            salaryParserResult.setHasDotInValue(hasDotInValue);
 
             if(currency != null) {
                 if(!isSalaryLooksNormal(currency, valueInt)) {
@@ -79,6 +78,10 @@ public class ParserFromOrToPrecise extends AbstractParser {
 
         if(preciseByCurrency) return null;
         return predictCurrency(salaryParserResultList);
+    }
+
+    @Override public String toString() {
+        return this.getClass().getSimpleName() + ", PATTERN " + PATTERN;
     }
 
 }

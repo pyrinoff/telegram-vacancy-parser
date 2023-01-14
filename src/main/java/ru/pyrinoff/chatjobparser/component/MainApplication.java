@@ -15,7 +15,7 @@ public class MainApplication {
 //    @NotNull final String CHAT_EXPORT_EXAMPLE = "./chatExportTest.json";
     @NotNull final String CHAT_EXPORT_EXAMPLE = "./chatExport.json";
 
-//    @NotNull final Integer ID = 178724;
+//    @NotNull final Integer ID = 174507;
     @NotNull final Integer ID = null;
 
     public void start(@Nullable String[] args) {
