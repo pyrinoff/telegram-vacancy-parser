@@ -35,6 +35,9 @@ public class Vacancy extends AbstractDTOModel {
     @Enumerated(EnumType.STRING)
     private @Nullable CurrencyEnum currency;
 
+    @Column
+    private @NotNull Boolean withPrediction;
+
     @ElementCollection
     @CollectionTable(name = "vacancy_markers")
     @Column

@@ -11,6 +11,11 @@ public interface IntegerUtils {
         return Integer.parseInt(integerString.replaceAll("[ .]", ""));
     }
 
+    @SneakyThrows
+    static @Nullable Float parseFloat(@NotNull String floatOrIntegerString) {
+        return Float.parseFloat(floatOrIntegerString.replaceAll(" ", ""));
+    }
+
     static boolean isValueInRange(@Nullable final Integer value, @NotNull final Integer min, @NotNull final Integer max) {
         return value >= min && value <= max;
 

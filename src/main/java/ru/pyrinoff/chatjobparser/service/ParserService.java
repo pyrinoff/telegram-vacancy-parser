@@ -12,7 +12,8 @@ import ru.pyrinoff.chatjobparser.exception.service.parser.ParsedTextEmpty;
 import ru.pyrinoff.chatjobparser.exception.service.parser.VacancyNotCorrect;
 import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
 import ru.pyrinoff.chatjobparser.model.telegram.*;
-import ru.pyrinoff.chatjobparser.parser.salary.AbstractParser;
+import ru.pyrinoff.chatjobparser.parser.marker.AbstractMarkerParser;
+import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
 import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
 import ru.pyrinoff.chatjobparser.util.FileUtils;
 import ru.pyrinoff.chatjobparser.util.JsonUtil;
@@ -20,7 +21,9 @@ import ru.pyrinoff.chatjobparser.util.JsonUtil;
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -31,7 +34,10 @@ public class ParserService {
     private @NotNull VacancyService vacancyService;
 
     @Autowired
-    private @NotNull List<AbstractParser> salaryParserList;
+    private @NotNull List<AbstractSalaryParser> salaryParserList;
+
+    @Autowired
+    private @NotNull List<AbstractMarkerParser> markerParserList;
 
     private @Nullable ChatExportJson chatExportJson;
 
@@ -45,11 +51,22 @@ public class ParserService {
     }
 
     @SneakyThrows
-    public @Nullable void parseSalary(@NotNull final String text, @NotNull final Vacancy vacancy) {
-        @Nullable SalaryParserResult salaryParserResult = null;
-        if(AbstractParser.DEBUG) System.out.println("Text: "+text);
+    public void parseMarkers(@NotNull final String text, @NotNull final Vacancy vacancy) {
+        @NotNull Set<String> markersResultSet = new HashSet<>();
+        for(@NotNull final AbstractMarkerParser oneMarkerParser : markerParserList) {
+            @Nullable String parsedMarker = oneMarkerParser.getMarker(text);
+            if(oneMarkerParser == null) continue;
+            markersResultSet.add(parsedMarker);
+        }
+        vacancy.setMarkers(markersResultSet);
+    }
 
-        for(@NotNull final AbstractParser oneSalaryParser : salaryParserList) {
+    @SneakyThrows
+    public void parseSalary(@NotNull final String text, @NotNull final Vacancy vacancy) {
+        @Nullable SalaryParserResult salaryParserResult = null;
+        if(AbstractSalaryParser.DEBUG) System.out.println("Text: "+text);
+
+        for(@NotNull final AbstractSalaryParser oneSalaryParser : salaryParserList) {
             salaryParserResult = oneSalaryParser.parse(text);
             if(salaryParserResult != null) break;
         }
@@ -59,6 +76,7 @@ public class ParserService {
         vacancy.setSalaryFrom(salaryParserResult.getFrom());
         vacancy.setSalaryTo(salaryParserResult.getTo());
         vacancy.setCurrency(salaryParserResult.getCurrencyEnum());
+        vacancy.setWithPrediction(salaryParserResult.getWithPrediction());
     }
 
     @SneakyThrows
@@ -107,14 +125,20 @@ public class ParserService {
     @SneakyThrows
     private @NotNull Vacancy parseMessageToVacancy(Message message) {
         @NotNull final Vacancy vacancy = new Vacancy();
+        //DATE
         parseDate(message, vacancy);
+        //TEXT
         @Nullable String text = cleanupText(parseText(message));
         if(text == null || text.length() < MIN_VACANCY_TEXT_LENGTH) throw new MessageTooSmall();
         System.out.println("TEXT: " + text);
+        //SALARY
         parseSalary(text, vacancy);
-        if (vacancy.getSalaryFrom() == null && vacancy.getSalaryTo() == null)
+        if (vacancy.getSalaryFrom() == null && vacancy.getSalaryTo() == null || vacancy.getCurrency() == null || vacancy.getWithPrediction() == null)
             throw new VacancyNotCorrect("Cant parse vacancy salary!");
         System.out.println("Salary parsed, from: " + vacancy.getSalaryFrom() + ", to: " + vacancy.getSalaryTo() + ", currency: " + vacancy.getCurrency());
+        //MARKERS
+        parseMarkers(text, vacancy);
+
         return vacancy;
     }
 
@@ -130,12 +154,7 @@ public class ParserService {
     }
 
     public static @Nullable String cleanupText(@NotNull String dirtyString) {
-        dirtyString = dirtyString.replaceAll(",|$|\r|\n|\\+|\\(|\\)}", " ");//v1 (positive)
-        //        dirtyString = dirtyString.replaceAll("[^\\w:\\/@#-]", " "); //v2 negative not working on cyrillic
-        dirtyString = dirtyString.replaceAll(": ", " ");
-        dirtyString = dirtyString.replaceAll(" :", " ");
-        dirtyString = dirtyString.replaceAll("- ", " ");
-        dirtyString = dirtyString.replaceAll(" -", " ");
+        dirtyString = dirtyString.replaceAll("$|\r|\n|\\+|\\(|\\)|: | :|, | ,| \\/|\\/ ", " ");//v1 (positive)
         dirtyString = dirtyString.replaceAll("(\\d)[ \\.]{1,2}000", "$1000");
         dirtyString = dirtyString.replaceAll("\s{2,}+", " ");
         dirtyString = dirtyString.trim().toLowerCase();

@@ -12,7 +12,7 @@ import java.util.List;
 
 @Order(10)
 @Component
-public class ParserFromToPrecise extends AbstractParser {
+public class ParserFromToPrecise extends AbstractSalaryParser {
 
     @Getter
     public @NotNull String pattern = getPatternStatic();
