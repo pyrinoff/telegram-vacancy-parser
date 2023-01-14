@@ -1,12 +1,13 @@
 package ru.pyrinoff.chatjobparser.parser.salary;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserData;
 import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
-import ru.pyrinoff.chatjobparser.util.IntegerUtils;
 import ru.pyrinoff.chatjobparser.util.RegexUtils;
 
 import java.util.ArrayList;
@@ -17,71 +18,45 @@ import java.util.Map;
 @Component
 public class ParserFromOrToPrecise extends AbstractParser {
 
-    public static @NotNull String PATTERN = "(от|до){1}"+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ+PATTERN_PART_ONE_BORDER+CAN_BE_WHITESPACE+PATTERN_PART_K+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ;
+    @Getter
+    public @NotNull String pattern = getPatternStatic();
+
+    public static @NotNull String getPatternStatic() {
+        return "(от|до){1}"+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ+PATTERN_PART_ONE_BORDER+CAN_BE_WHITESPACE+PATTERN_PART_K+CAN_BE_WHITESPACE+PATTERN_PART_CURRENCY_NONREQ;
+    }
+
+    @Override protected @Nullable SalaryParserData parseOneMatch(List<String> oneMatch) {
+        return parseOneMatchStatic(oneMatch);
+    }
+
+    protected static @Nullable SalaryParserData parseOneMatchStatic(List<String> oneMatch) {
+        final @Nullable String word = oneMatch.get(1);
+        final @Nullable String currency = oneMatch.get(5) != null ? oneMatch.get(5) : oneMatch.get(2);
+        final @Nullable String value = oneMatch.get(3);
+        final @Nullable String thousand = oneMatch.get(4);
+
+        if(word.equals("от")) {
+            return new SalaryParserData()
+                    .setWordFrom(word)
+                    .setCurrencyFrom(currency)
+                    .setValueFrom(value)
+                    .setThousandFrom(thousand)
+                    ;
+        }
+        else if(word.equals("до")) {
+            return new SalaryParserData()
+                    .setWordTo(word)
+                    .setCurrencyTo(currency)
+                    .setValueTo(value)
+                    .setThousandTo(thousand)
+            ;
+        }
+        return null;
+    }
 
     @Override public @Nullable SalaryParserResult parse(@NotNull String text) {
-        if(DEBUG) System.out.println("Parser: " + this.getClass().getSimpleName());
-        return parseMethod(text, true);
-    }
-
-    public static @Nullable SalaryParserResult parseMethod(@NotNull final String text, final boolean preciseByCurrency) {
-        @NotNull final Map<Integer, List<String>> matches = RegexUtils.getMatches(text, ParserFromOrToPrecise.PATTERN);
-        if (matches == null) return null;
-
-        @NotNull final List<SalaryParserResult> salaryParserResultList = new ArrayList<>();
-
-        for (int i = 0; i < matches.size(); i++) {
-            if(DEBUG) System.out.println("Loop: " + i);
-            @NotNull final SalaryParserResult salaryParserResult = new SalaryParserResult();
-            @NotNull final List<String> oneMatch = matches.get(i);
-            if(DEBUG) System.out.println(oneMatch);
-
-
-            final @Nullable String fromOrTo = oneMatch.get(1);
-            final @Nullable String currencyOne = oneMatch.get(2);
-            final @Nullable String valueString = oneMatch.get(3);
-            final @Nullable Integer value = IntegerUtils.parseInt(valueString);
-            final @Nullable String thousand = oneMatch.get(4);
-            final @Nullable String currencyTwo = oneMatch.get(5);
-
-            if (value == null) {
-                System.out.println("Required groups (value) is null, must not be here. Is regex changed?");
-                continue;
-            }
-            if (fromOrTo == null) {
-                System.out.println("Required groups (fromOrTo) is null, must not be here. Is regex changed?");
-                continue;
-            }
-
-            final boolean isK = thousand != null && !thousand.isEmpty();
-            final @Nullable String currencyString = currencyOne != null ? currencyOne : currencyTwo;
-            @Nullable final CurrencyEnum currency = getCurrencyByString(currencyString);
-            final boolean isFrom = fromOrTo.equals("от");
-            final boolean isTo = fromOrTo.equals("до");
-            final boolean hasDotInValue = valueString.contains(".") || valueString.contains(".");
-
-            final int valueInt = isK ? value * 1000 : value;
-
-            salaryParserResult.setCurrencyEnum(currency);
-            if(isFrom) salaryParserResult.setFrom(valueInt);
-            if(isTo) salaryParserResult.setTo(valueInt);
-
-            if(currency != null) {
-                if(!isSalaryLooksNormal(currency, valueInt)) {
-                    System.out.println("Salary looks like innormal, skip!");
-                    continue;
-                }
-                return salaryParserResult;
-            }
-            salaryParserResultList.add(salaryParserResult);
-        }
-
-        if(preciseByCurrency) return null;
-        return predictCurrency(salaryParserResultList);
-    }
-
-    @Override public String toString() {
-        return this.getClass().getSimpleName() + ", PATTERN " + PATTERN;
+        if (DEBUG) System.out.println("Parser: " + super.getClass().getSimpleName());
+        return parseDefault(text, true, true, false);
     }
 
 }
