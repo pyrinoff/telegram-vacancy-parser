@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
 import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
+import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
 
 import static ru.pyrinoff.chatjobparser.service.ParserService.cleanupText;
@@ -27,13 +28,11 @@ public final class ParserServiceWordTest extends AbstractSpringTest {
 
     @Test
     public void parseWord1() {
-        @NotNull final Vacancy vacancy = new Vacancy();
         @NotNull String text = " fdsfds java fdff ffd ";
-        text = cleanupText(text);
-        Assertions.assertNotNull(text);
-        parserService.parseWords(text, vacancy);
-        //Assertions.assertTrue(vacancy.getMarkers().contains("java"));
-        Assertions.assertArrayEquals(new String[]{"java"}, vacancy.getWords().toArray());
+        @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
+        parserServiceResult.setText(cleanupText(text));
+        parserService.parseWords(parserServiceResult);
+        Assertions.assertArrayEquals(new String[]{"java"}, parserServiceResult.getWords().toArray());
     }
 
 }

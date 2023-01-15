@@ -20,6 +20,7 @@ cd
 fiddler
 sql
 react
+java
 javascript
 teamcity
 js

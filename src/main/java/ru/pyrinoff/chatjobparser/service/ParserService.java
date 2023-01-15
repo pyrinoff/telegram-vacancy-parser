@@ -20,7 +20,6 @@ import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
 import ru.pyrinoff.chatjobparser.parser.word.WordParser;
 import ru.pyrinoff.chatjobparser.util.FileUtils;
 import ru.pyrinoff.chatjobparser.util.JsonUtil;
-import ru.pyrinoff.chatjobparser.util.TextUtil;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
@@ -31,8 +30,15 @@ import java.util.stream.Collectors;
 @Service
 public class ParserService {
 
+    private static boolean SHOW_TEXT_DURING_PARSE = false;
+
     @Nullable final Set<String> wordsToSearch;
+
     private final int MIN_VACANCY_TEXT_LENGTH = 250;
+
+    private @NotNull final List<ParserServiceResult> parserServiceResultList = new ArrayList<>();
+
+    private @NotNull Set<ParserServiceResult> parserServiceResultSet = new HashSet<>();
 
     @Autowired
     private @NotNull VacancyService vacancyService;
@@ -45,15 +51,18 @@ public class ParserService {
 
     private @Nullable ChatExportJson chatExportJson;
 
-    private @NotNull final List<ParserServiceResult> parserServiceResults = new ArrayList<>();
-
-    private @NotNull final Set<ParserServiceResult> parserServiceResultsUnique = new HashSet<>();
-
-    private static boolean SHOW_TEXT_DURING_PARSE = false;
-
     @SneakyThrows
     public ParserService() {
         wordsToSearch = new HashSet<>(FileUtils.fileGetContent("src/main/resources/words.txt"));
+    }
+
+    public static @Nullable String cleanupText(@Nullable String dirtyString) {
+        if (dirtyString == null) return null;
+        dirtyString = dirtyString.replaceAll("$|\r|\n|\\+|\\(|\\)|: | :|, | ,| \\/|\\/ ", " ");//v1 (positive)
+        dirtyString = dirtyString.replaceAll("(\\d)[ \\.]{1,2}000", "$1000");
+        dirtyString = dirtyString.replaceAll("\s{2,}+", " ");
+        dirtyString = dirtyString.trim().toLowerCase();
+        return dirtyString;
     }
 
     @PostConstruct
@@ -64,27 +73,30 @@ public class ParserService {
     }
 
     @SneakyThrows
-    public void parseMarkers(@NotNull final String text, @NotNull final Vacancy vacancy) {
+    public void parseMarkers(@NotNull final ParserServiceResult parserServiceResult) {
         @NotNull Set<String> markersResultSet = new HashSet<>();
-        @NotNull Set<String> uniqueWordsInText = TextUtil.getSetOfWords(text);
+
         for (@NotNull final AbstractMarkerParser oneMarkerParser : markerParserList) {
-            @Nullable String parsedMarker = oneMarkerParser.getMarker(text, uniqueWordsInText);
+            @Nullable String parsedMarker = oneMarkerParser.getMarker(parserServiceResult);
             if (parsedMarker == null) continue;
             markersResultSet.add(parsedMarker);
         }
-        vacancy.setMarkers(markersResultSet);
+        parserServiceResult.setMarkers(markersResultSet);
     }
 
     @SneakyThrows
-    public void parseWords(@NotNull final String text, @NotNull final Vacancy vacancy) {
-        @NotNull Set<String> wordsResultSet = WordParser.parse(text, wordsToSearch);
+    public void parseWords(@NotNull final ParserServiceResult parserServiceResult) {
+        @NotNull Set<String> wordsResultSet = WordParser.parse(parserServiceResult, wordsToSearch);
         if (wordsResultSet.size() == 0) return;
-        vacancy.setWords(wordsResultSet);
+        parserServiceResult.setWords(wordsResultSet);
     }
 
     @SneakyThrows
-    public void parseSalary(@NotNull final String text, @NotNull final Vacancy vacancy) {
+    public void parseSalary(@NotNull final ParserServiceResult parserServiceResult) {
         @Nullable SalaryParserResult salaryParserResult = null;
+        @Nullable final String text = parserServiceResult.getText();
+        if (text == null) throw new ParsedTextEmpty();
+
         if (AbstractSalaryParser.DEBUG) System.out.println("Text: " + text);
 
         for (@NotNull final AbstractSalaryParser oneSalaryParser : salaryParserList) {
@@ -94,17 +106,18 @@ public class ParserService {
 
         if (salaryParserResult == null) throw new VacancyNotCorrect("Cant parse salary!");
 
-        vacancy.setSalaryFrom(salaryParserResult.getFrom());
-        vacancy.setSalaryTo(salaryParserResult.getTo());
-        vacancy.setCurrency(salaryParserResult.getCurrencyEnum());
-        vacancy.setWithPrediction(salaryParserResult.getWithPrediction());
+        parserServiceResult.setSalaryFrom(salaryParserResult.getFrom());
+        parserServiceResult.setSalaryTo(salaryParserResult.getTo());
+        parserServiceResult.setCurrency(salaryParserResult.getCurrencyEnum());
+        parserServiceResult.setWithPrediction(salaryParserResult.getWithPrediction());
     }
 
     @SneakyThrows
-    public void parseFileToMemory(String chatExportJsonFilepath) {
+    public void parseFileToMemory(@NotNull final String chatExportJsonFilepath) {
         final @Nullable String fileContent = FileUtils.fileGetContentAsString(chatExportJsonFilepath);
         if (fileContent == null) throw new RuntimeException("No content in json file: " + chatExportJsonFilepath);
         chatExportJson = JsonUtil.jsonToObject(fileContent, ChatExportJson.class);
+        System.out.println("Loaded fron file: " + chatExportJson.getMessages().size());
     }
 
     public void filterById(@NotNull final Integer messageId) {
@@ -115,84 +128,103 @@ public class ParserService {
     }
 
     @SneakyThrows
-    public void parseVacancies(final boolean writeToDb) {
+    public void parseVacancies(@NotNull String filepath, @Nullable Integer filterById, final boolean writeToDb) {
         System.out.println("Starting parse vacancies");
+        parseFileToMemory(filepath);
+        if (filterById != null) filterById(filterById);
+        parseVacanciesFromTelegramHistory();
+        makeVacanciesUnique();
+        if (writeToDb) saveVacanciesToDb();
+    }
+
+    @SneakyThrows
+    public void parseVacanciesFromTelegramHistory() {
         if (chatExportJson == null)
             throw new Exception("Chat history not loaded to memory! Use parseFileToMemory() first!");
-        int stored = 0;
-        int index = 0;
+        parserServiceResultList.clear();
+        parserServiceResultSet.clear();
+
         for (Message oneTelegramMessage : chatExportJson.getMessages()) {
-            index++;
             try {
-                @Nullable Vacancy vacancy = parseMessageToVacancy(oneTelegramMessage);
-                if(writeToDb) vacancyService.add(vacancy);
-                stored++;
+                @NotNull final ParserServiceResult parserServiceResult = parseTgMessageToResult(oneTelegramMessage);
+                parserServiceResultList.add(parserServiceResult);
             } catch (@NotNull final Exception e) {
                 if (e instanceof MessageTooSmall || e instanceof ParsedTextEmpty) continue;
                 if (e instanceof VacancyNotCorrect) {
                     System.out.println("SKIP MESSAGE #" + oneTelegramMessage.getId());
                     continue;
                 }
-                System.out.println("Exception during parse message #" + index);
+                System.out.println("Exception during parse message #" + oneTelegramMessage.getId());
                 e.printStackTrace();
                 //if (true) break;
                 continue;
             }
         }
-        System.out.println("Parsing ended, processed: " + index + ", stored: " + stored);
+        System.out.println("Parsing ended, processed: " + chatExportJson.getMessages().size() + ", stored: " + parserServiceResultList.size());
     }
 
     @SneakyThrows
-    private @NotNull Vacancy parseMessageToVacancy(Message message) {
-        @NotNull final Vacancy vacancy = new Vacancy();
-        //DATE
-        parseDate(message, vacancy);
-        //TEXT
-        @Nullable String text = parseText(message);
-        if (text == null || text.length() < MIN_VACANCY_TEXT_LENGTH) throw new MessageTooSmall();
-        if(SHOW_TEXT_DURING_PARSE) System.out.println("TEXT: " + text);
-        //SALARY
-        parseSalary(text, vacancy);
-        if(SHOW_TEXT_DURING_PARSE) System.out.println("Salary parsed, from: " + vacancy.getSalaryFrom() + ", to: " + vacancy.getSalaryTo() + ", currency: " + vacancy.getCurrency());
-        //MARKERS
-        parseMarkers(text, vacancy);
-        if(SHOW_TEXT_DURING_PARSE) if (vacancy.getMarkers().size() > 0) System.out.println("MARKERS: " + String.join(" ", vacancy.getMarkers()));
-        //WORDS
-        parseWords(text, vacancy);
-        if(SHOW_TEXT_DURING_PARSE) if (vacancy.getWords().size() > 0) System.out.println("WORDS: " + String.join(" ", vacancy.getWords()));
-        return vacancy;
+    public @NotNull ParserServiceResult parseTgMessageToResult(@NotNull final Message message) {
+        @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
+        parseDate(message, parserServiceResult);
+        parseText(message, parserServiceResult, MIN_VACANCY_TEXT_LENGTH);
+        parseSalary(parserServiceResult);
+        parseMarkers(parserServiceResult);
+        parseWords(parserServiceResult);
+        return parserServiceResult;
     }
 
-    private @Nullable void parseDate(@NotNull final Message message, @NotNull final Vacancy vacancy) {
+    private void parseDate(@NotNull final Message message, @NotNull final ParserServiceResult parserServiceResult) {
         @Nullable Date date = Date.from(Instant.ofEpochSecond(Long.parseLong(message.getDateUnixtime())));
         if (date == null) throw new MessageDateEmpty();
-        vacancy.setDate(date);
+        parserServiceResult.setDate(date);
     }
 
-    @Nullable public String parseText(@NotNull Message message) {
+    public void parseText(@NotNull final Message message, @NotNull final ParserServiceResult parserServiceResult, final int minLength) {
         @Nullable String text = cleanupText(getTextFromTextList(message.getTextEntities(), true));
         if (text == null) throw new ParsedTextEmpty();
-        return text;
+        if (text.length() < minLength) throw new MessageTooSmall();
+        parserServiceResult.setText(text);
     }
 
     private @Nullable String getTextFromTextList(@Nullable final List<TextEntity> textList, final boolean skipLinks) {
         if (textList == null || textList.isEmpty()) return null;
         StringBuilder sb = new StringBuilder();
         for (@NotNull final TextEntity oneText : textList) {
-            if(skipLinks && TextTypeEnum.valueOf(oneText.getType()) == TextTypeEnum.LINK) continue;
+            if (skipLinks && TextTypeEnum.valueOf(oneText.getType()) == TextTypeEnum.LINK) continue;
             sb.append(oneText.getText());
         }
         if (sb.isEmpty()) return null;
         return sb.toString();
     }
 
-    public static @Nullable String cleanupText(@Nullable String dirtyString) {
-        if(dirtyString == null) return null;
-        dirtyString = dirtyString.replaceAll("$|\r|\n|\\+|\\(|\\)|: | :|, | ,| \\/|\\/ ", " ");//v1 (positive)
-        dirtyString = dirtyString.replaceAll("(\\d)[ \\.]{1,2}000", "$1000");
-        dirtyString = dirtyString.replaceAll("\s{2,}+", " ");
-        dirtyString = dirtyString.trim().toLowerCase();
-        return dirtyString;
+    private void makeVacanciesUnique() {
+        if (parserServiceResultList == null || parserServiceResultList.isEmpty()) return;
+        parserServiceResultSet = new HashSet<>(parserServiceResultList);
+        System.out.println("Duplicates deleted, before: " + parserServiceResultList.size() + ", after: " + parserServiceResultSet.size());
+    }
+
+    private @Nullable Vacancy mapResultToVacancy(@Nullable final ParserServiceResult parserServiceResult) {
+        if (parserServiceResult == null) return null;
+        parserServiceResultSet = new HashSet<>(parserServiceResultList);
+        @NotNull final Vacancy vacancy = new Vacancy();
+        vacancy.setDate(parserServiceResult.getDate());
+        vacancy.setSalaryFrom(parserServiceResult.getSalaryFrom());
+        vacancy.setSalaryTo(parserServiceResult.getSalaryTo());
+        vacancy.setCurrency(parserServiceResult.getCurrency());
+        vacancy.setMarkers(parserServiceResult.getMarkers());
+        vacancy.setWords(parserServiceResult.getWords());
+        return vacancy;
+    }
+
+    private void saveVacanciesToDb() {
+        if (parserServiceResultSet == null || parserServiceResultSet.isEmpty()) return;
+        @NotNull final List<Vacancy> vacancies = Collections.emptyList();
+        for (@NotNull final ParserServiceResult oneResult : parserServiceResultSet) {
+            @NotNull final Vacancy vacancy = mapResultToVacancy(oneResult);
+            if (vacancy != null) vacancies.add(vacancy);
+        }
+        vacancyService.addAll(vacancies);
     }
 
 }

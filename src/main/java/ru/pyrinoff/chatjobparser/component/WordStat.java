@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.pyrinoff.chatjobparser.exception.service.parser.ParsedTextEmpty;
+import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.model.telegram.Message;
 import ru.pyrinoff.chatjobparser.service.ParserService;
 import ru.pyrinoff.chatjobparser.util.ArrayUtil;
@@ -28,8 +29,8 @@ public class WordStat {
 
         for (Message oneTelegramMessage :  parserService.getChatExportJson().getMessages()) {
             try {
-                @Nullable String text = parserService.parseText(oneTelegramMessage);
-                if (text != null) wordList.addAll(TextUtil.getSetOfWords(text));
+                @NotNull final ParserServiceResult parserServiceResult = parserService.parseTgMessageToResult(oneTelegramMessage);
+                if (parserServiceResult != null) wordList.addAll(parserServiceResult.getTextWords());
             }
             catch (@NotNull final ParsedTextEmpty e) {
                 continue;

@@ -3,13 +3,13 @@ package ru.pyrinoff.chatjobparser.parser.marker;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.util.NumberUtil;
 import ru.pyrinoff.chatjobparser.util.RegexUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class ExperienceMarker extends AbstractMarkerParser {
@@ -52,10 +52,10 @@ public class ExperienceMarker extends AbstractMarkerParser {
         return NumberUtil.findMaxFloat(numbers);
     }
 
-    @Override public @Nullable String getMarker(@NotNull String text, @NotNull Set<String> uniqueWordsInText) {
+    @Override public @Nullable String getMarker(@NotNull final ParserServiceResult parserServiceResult) {
         @NotNull final List<Float> numbers = new ArrayList<>();
-        numbers.add(patternOneMaxValue(text));
-        numbers.add(patternTwoMaxValue(text));
+        numbers.add(patternOneMaxValue(parserServiceResult.getText()));
+        numbers.add(patternTwoMaxValue(parserServiceResult.getText()));
         @NotNull final Float maxYearValue = NumberUtil.findMaxFloat(numbers);
         if (maxYearValue == null) return null;
         return "year" + maxYearValue;

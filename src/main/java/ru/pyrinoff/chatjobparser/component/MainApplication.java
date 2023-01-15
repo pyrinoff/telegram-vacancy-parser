@@ -25,9 +25,7 @@ public class MainApplication {
     }
 
     public void parse() {
-        parserService.parseFileToMemory(CHAT_EXPORT_EXAMPLE);
-        if(ID != null) parserService.filterById(ID);
-        parserService.parseVacancies(WRITE_TO_DB);
+        parserService.parseVacancies(CHAT_EXPORT_EXAMPLE, ID, WRITE_TO_DB);
     }
 
 }

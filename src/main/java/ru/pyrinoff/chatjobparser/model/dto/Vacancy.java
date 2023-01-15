@@ -20,32 +20,32 @@ import java.util.Set;
 @Table(name = "vacancy", schema = "public")
 public class Vacancy extends AbstractDTOModel {
 
-    private static final long serialVersionUID = 1;
+    protected static final long serialVersionUID = 1;
 
     @Column
-    private @NotNull Date date;
+    protected @NotNull Date date;
 
     @Column
-    private @Nullable Integer salaryFrom;
+    protected @Nullable Integer salaryFrom;
 
     @Column
-    private @Nullable Integer salaryTo;
+    protected @Nullable Integer salaryTo;
 
     @Column
     @Enumerated(EnumType.STRING)
-    private @Nullable CurrencyEnum currency;
+    protected @Nullable CurrencyEnum currency;
 
     @Column
-    private @NotNull Boolean withPrediction;
+    protected @NotNull Boolean withPrediction;
 
     @ElementCollection
     @CollectionTable(name = "vacancy_markers")
     @Column
-    private @NotNull Set<String> markers = new HashSet<>();
+    protected @NotNull Set<String> markers = new HashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "vacancy_words")
     @Column
-    private @NotNull Set<String> words = new HashSet<>();
+    protected @NotNull Set<String> words = new HashSet<>();
 
 }
