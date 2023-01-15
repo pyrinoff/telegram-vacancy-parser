@@ -35,51 +35,66 @@ public class Message {
     @JsonProperty("id")
     public Integer id;
 
+    @JsonIgnore
     @JsonProperty("type")
     public String type;
 
+    @JsonIgnore
     @JsonProperty("date")
     public String date;
 
     @JsonProperty("date_unixtime")
     public String dateUnixtime;
 
+    @JsonIgnore
     @JsonProperty("edited")
     public String edited;
 
+    @JsonIgnore
     @JsonProperty("edited_unixtime")
     public String editedUnixtime;
 
+    @JsonIgnore
     @JsonProperty("actor")
     public String actor;
 
+    @JsonIgnore
     @JsonProperty("actor_id")
     public String actor_id;
 
+    @JsonIgnore
     @JsonProperty("action")
     public String action;
 
+    @JsonIgnore
     @JsonProperty("message_id")
     public String messageId;
 
+    @JsonIgnore
     @JsonProperty("from")
     public String from;
 
+    @JsonIgnore
     @JsonProperty("from_id")
     public String fromId;
 
+    @JsonIgnore
     @JsonProperty("forwarded_from")
     public String forwardedFrom;
 
+    @JsonIgnore
     @JsonProperty("reply_to_message_id")
     public String replyToMessageId;
 
+    @JsonIgnore
     @JsonProperty("photo")
     public String photo;
 
+    @JsonIgnore
     @JsonProperty("width")
     public Integer width;
 
+    @JsonIgnore
     @JsonProperty("height")
     public Integer height;
 

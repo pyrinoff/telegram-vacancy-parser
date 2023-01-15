@@ -12,17 +12,22 @@ public class MainApplication {
     @Autowired
     @NotNull ParserService parserService;
 
-//    @NotNull final String CHAT_EXPORT_EXAMPLE = "./chatExportTest.json";
+    //@NotNull final String CHAT_EXPORT_EXAMPLE = "./chatExportTest.json";
     @NotNull final String CHAT_EXPORT_EXAMPLE = "./chatExport.json";
 
-//    @NotNull final Integer ID = 174507;
+    //@NotNull final Integer ID = 174507;
     @NotNull final Integer ID = null;
 
+    final boolean WRITE_TO_DB = false;
+
     public void start(@Nullable String[] args) {
+        parse();
+    }
+
+    public void parse() {
         parserService.parseFileToMemory(CHAT_EXPORT_EXAMPLE);
         if(ID != null) parserService.filterById(ID);
-        parserService.parseVacancies();
-
+        parserService.parseVacancies(WRITE_TO_DB);
     }
 
 }

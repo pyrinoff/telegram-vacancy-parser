@@ -2,19 +2,18 @@ package ru.pyrinoff.chatjobparser.parser.salary;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
 import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserData;
 import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
-import ru.pyrinoff.chatjobparser.util.IntegerUtils;
+import ru.pyrinoff.chatjobparser.util.NumberUtil;
 import ru.pyrinoff.chatjobparser.util.RegexUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static ru.pyrinoff.chatjobparser.util.IntegerUtils.isValueInRange;
+import static ru.pyrinoff.chatjobparser.util.NumberUtil.isValueInRange;
 
 @Component
 public abstract class AbstractSalaryParser {
@@ -26,7 +25,7 @@ public abstract class AbstractSalaryParser {
     public static final @NotNull String PATTERN_PART_CURRENCY_REQ = PATTERN_PART_CURRENCY + "{1}";
     public static final @NotNull String PATTERN_PART_CURRENCY_NONREQ = PATTERN_PART_CURRENCY + "{0,1}";
     public static final @NotNull String PATTERN_PART_CURRENCY_OR_WORD_REQ = "(\\$|USD|руб\\.|руб|р|р\\.|rub|eur|долларов|€|euro|usd|rur|net|нетто|на руки|в месяц|месяц){1}";
-    public static volatile boolean DEBUG = false;
+    public static boolean DEBUG = false;
 
     protected static @Nullable CurrencyEnum getCurrencyByString(@Nullable final String currencyString) {
         if (currencyString == null || currencyString.isEmpty()) return null;
@@ -115,7 +114,7 @@ public abstract class AbstractSalaryParser {
             Integer valueToInt = null;
 
             if (salaryParserData.getValueFrom() != null) {
-                @Nullable Float valueFromFloat = IntegerUtils.parseFloat(salaryParserData.getValueFrom());
+                @Nullable Float valueFromFloat = NumberUtil.parseFloat(salaryParserData.getValueFrom());
                 if(valueFromFloat == null) {
                     System.out.println("Float parsing error??!!");
                     continue;
@@ -125,13 +124,18 @@ public abstract class AbstractSalaryParser {
             }
 
             if (salaryParserData.getValueTo() != null) {
-                @Nullable Float valueToFloat = IntegerUtils.parseFloat(salaryParserData.getValueTo());
+                @Nullable Float valueToFloat = NumberUtil.parseFloat(salaryParserData.getValueTo());
                 if(valueToFloat == null) {
                     System.out.println("Float parsing error??!!");
                     continue;
                 }
                 if (isK) valueToFloat *= 1000;
                 valueToInt = Math.round(valueToFloat);
+            }
+
+            if(valueFromInt != null && valueToInt !=null && valueFromInt > valueToInt) {
+                if(DEBUG) System.out.println("From greater than to, skip it!");
+                continue;
             }
 
             salaryParserResult.setCurrencyEnum(currency);

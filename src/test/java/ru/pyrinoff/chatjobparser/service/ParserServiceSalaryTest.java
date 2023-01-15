@@ -12,7 +12,7 @@ import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
 import static ru.pyrinoff.chatjobparser.service.ParserService.cleanupText;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public final class ParserServiceTest extends AbstractSpringTest {
+public final class ParserServiceSalaryTest extends AbstractSpringTest {
 
     @Autowired
     private static @NotNull ParserService parserService;

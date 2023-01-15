@@ -2,14 +2,15 @@ package ru.pyrinoff.chatjobparser.parser.marker;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @Component
 public abstract class AbstractMarkerParser {
 
-    public static volatile boolean DEBUG = false;
+    public static boolean DEBUG = false;
 
-    abstract public @Nullable String getMarker(@NotNull String text);
+    abstract public @Nullable String getMarker(@NotNull String text, @NotNull Set<String> uniqueWordsInText);
 
 }
