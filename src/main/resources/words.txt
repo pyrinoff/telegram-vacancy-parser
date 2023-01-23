@@ -6,6 +6,8 @@ json
 api
 selenium
 selenide
+cypress
+testcomplete
 webdriver
 junior
 middle

@@ -86,25 +86,25 @@ public abstract class AbstractSalaryParser {
             //final @Nullable Integer valueFrom = IntegerUtils.parseInt(valueFromString);
 
             if (salaryParserData.getValueFrom() == null && salaryParserData.getValueTo() == null) {
-                System.out.println("No values found! Skip.");
+                System.out.println("No values found! Why??? Skip.");
                 continue;
             }
 
             if (isRequiredFromTo && salaryParserData.getWordFrom() == null && salaryParserData.getWordTo() == null) {
-                System.out.println("Skip by strict getFromWord/getToWord");
+                if(DEBUG) System.out.println("Skip by strict getFromWord/getToWord");
                 continue;
             }
 
             @Nullable final String currencyString = salaryParserData.getCurrencyTo() != null ? salaryParserData.getCurrencyTo() : salaryParserData.getCurrencyFrom();
             @Nullable final CurrencyEnum currency = getCurrencyByString(currencyString);
             if (isRequiredCurrency && (currencyString == null || currency == null)) {
-                System.out.println("Skip by strict currencyFrom/currencyTo/currency");
+                if(DEBUG) System.out.println("Skip by strict currencyFrom/currencyTo/currency");
                 continue;
             }
 
             @Nullable final String thousandString = salaryParserData.getThousandTo() != null ? salaryParserData.getThousandTo() : salaryParserData.getThousandFrom();
             if (isRequiredThousand && (thousandString == null || thousandString.isEmpty())) {
-                System.out.println("Skip by strict thousand");
+                if(DEBUG) System.out.println("Skip by strict thousand");
                 continue;
             }
 
@@ -146,7 +146,7 @@ public abstract class AbstractSalaryParser {
                 if (valueFromInt != null && !isSalaryLooksNormal(currency, valueFromInt)
                         || valueToInt != null && !isSalaryLooksNormal(currency, valueToInt)
                 ) {
-                    System.out.println("Salary looks like innormal, skip!");
+                    if(DEBUG) System.out.println("Salary looks like innormal, skip!");
                     continue;
                 }
                 //found correct result

@@ -3,11 +3,9 @@ package ru.pyrinoff.chatjobparser.model.telegram;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import javax.annotation.processing.Generated;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
 @Getter

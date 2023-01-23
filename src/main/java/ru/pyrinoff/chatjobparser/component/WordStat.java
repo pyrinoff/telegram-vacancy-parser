@@ -9,7 +9,6 @@ import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.model.telegram.Message;
 import ru.pyrinoff.chatjobparser.service.ParserService;
 import ru.pyrinoff.chatjobparser.util.ArrayUtil;
-import ru.pyrinoff.chatjobparser.util.TextUtil;
 
 import java.util.*;
 

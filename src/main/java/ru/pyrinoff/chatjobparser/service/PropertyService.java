@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Getter
 @Service
-@PropertySource("classpath:application.properties")
+@PropertySource("src/main/resources/application.properties")
 public class PropertyService {
 
     @Value("#{environment['database.url']}")

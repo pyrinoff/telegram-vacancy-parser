@@ -5,8 +5,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 
-import java.util.Set;
-
 @Component
 public abstract class AbstractMarkerParser {
 

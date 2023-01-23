@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
-import ru.pyrinoff.chatjobparser.util.TextUtil;
 
 @Component
 public class LoadTestingMarker extends AbstractMarkerParser {

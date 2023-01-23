@@ -13,7 +13,6 @@ import ru.pyrinoff.chatjobparser.repository.AbstractDTORepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Comparator;
 import java.util.List;
 
 public abstract class AbstractDTOService<M extends AbstractDTOModel, R extends AbstractDTORepository<M>> {

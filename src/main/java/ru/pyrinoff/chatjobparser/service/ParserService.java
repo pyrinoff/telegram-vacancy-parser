@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import ru.pyrinoff.chatjobparser.enumerated.model.telegram.TextTypeEnum;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageDateEmpty;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageTooSmall;
@@ -53,7 +54,7 @@ public class ParserService {
 
     @SneakyThrows
     public ParserService() {
-        wordsToSearch = new HashSet<>(FileUtils.fileGetContent("src/main/resources/words.txt"));
+        wordsToSearch = new HashSet<>(FileUtils.fileGetContent(ResourceUtils.getFile("classpath:words.txt")));
     }
 
     public static @Nullable String cleanupText(@Nullable String dirtyString) {
@@ -151,7 +152,7 @@ public class ParserService {
             } catch (@NotNull final Exception e) {
                 if (e instanceof MessageTooSmall || e instanceof ParsedTextEmpty) continue;
                 if (e instanceof VacancyNotCorrect) {
-                    System.out.println("SKIP MESSAGE #" + oneTelegramMessage.getId());
+                    if (AbstractSalaryParser.DEBUG) System.out.println("SKIP MESSAGE #" + oneTelegramMessage.getId());
                     continue;
                 }
                 System.out.println("Exception during parse message #" + oneTelegramMessage.getId());
@@ -191,7 +192,7 @@ public class ParserService {
         if (textList == null || textList.isEmpty()) return null;
         StringBuilder sb = new StringBuilder();
         for (@NotNull final TextEntity oneText : textList) {
-            if (skipLinks && TextTypeEnum.valueOf(oneText.getType()) == TextTypeEnum.LINK) continue;
+            if (skipLinks && TextTypeEnum.getByValue(oneText.getType()) == TextTypeEnum.LINK) continue;
             sb.append(oneText.getText());
         }
         if (sb.isEmpty()) return null;
@@ -199,14 +200,14 @@ public class ParserService {
     }
 
     private void makeVacanciesUnique() {
+        System.out.println("Starting de-duplication.");
         if (parserServiceResultList == null || parserServiceResultList.isEmpty()) return;
         parserServiceResultSet = new HashSet<>(parserServiceResultList);
-        System.out.println("Duplicates deleted, before: " + parserServiceResultList.size() + ", after: " + parserServiceResultSet.size());
+        System.out.println("Duplicates ok, before: " + parserServiceResultList.size() + ", after: " + parserServiceResultSet.size());
     }
 
     private @Nullable Vacancy mapResultToVacancy(@Nullable final ParserServiceResult parserServiceResult) {
         if (parserServiceResult == null) return null;
-        parserServiceResultSet = new HashSet<>(parserServiceResultList);
         @NotNull final Vacancy vacancy = new Vacancy();
         vacancy.setDate(parserServiceResult.getDate());
         vacancy.setSalaryFrom(parserServiceResult.getSalaryFrom());
@@ -218,13 +219,16 @@ public class ParserService {
     }
 
     private void saveVacanciesToDb() {
+        System.out.println("Starting save to DB.");
         if (parserServiceResultSet == null || parserServiceResultSet.isEmpty()) return;
-        @NotNull final List<Vacancy> vacancies = Collections.emptyList();
+        @NotNull final List<Vacancy> vacancies = new ArrayList<>();
         for (@NotNull final ParserServiceResult oneResult : parserServiceResultSet) {
             @NotNull final Vacancy vacancy = mapResultToVacancy(oneResult);
             if (vacancy != null) vacancies.add(vacancy);
         }
+        System.out.println("Mapped parsed results to vacancy: "+vacancies.size());
         vacancyService.addAll(vacancies);
+        System.out.println("Saved to DB.");
     }
 
 }

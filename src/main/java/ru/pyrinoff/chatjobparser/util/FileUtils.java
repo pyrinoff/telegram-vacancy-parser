@@ -3,10 +3,10 @@ package ru.pyrinoff.chatjobparser.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -23,6 +23,11 @@ public interface FileUtils {
         @NotNull final Path path = Path.of(filename);
         if (!Files.exists(path)) throw new FileNotFoundException("File not found!");
         return Files.readAllLines(path);
+    }
+    static @Nullable List<String> fileGetContent(@Nullable File file) throws IOException {
+        if(file == null) throw new RuntimeException("File null!");
+        if (!file.exists()) throw new FileNotFoundException("File not found!");
+        return Files.readAllLines(file.toPath());
     }
 
     static @Nullable String fileGetContentAsString(@Nullable String filename) throws IOException {

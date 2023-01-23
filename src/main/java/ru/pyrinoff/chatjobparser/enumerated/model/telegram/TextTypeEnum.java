@@ -1,13 +1,7 @@
 
 package ru.pyrinoff.chatjobparser.enumerated.model.telegram;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Getter;
-
-import javax.annotation.processing.Generated;
+import javax.annotation.Nullable;
 
 public enum TextTypeEnum {
 
@@ -27,6 +21,14 @@ public enum TextTypeEnum {
 
     public String getValue() {
         return value;
+    }
+
+    public static @Nullable TextTypeEnum getByValue(@Nullable final String typeString) {
+        if(typeString == null || typeString.isEmpty()) return null;
+        for(TextTypeEnum oneValue : values()) {
+            if(oneValue.getValue().equals(typeString)) return oneValue;
+        }
+        return null;
     }
 
     @Override
