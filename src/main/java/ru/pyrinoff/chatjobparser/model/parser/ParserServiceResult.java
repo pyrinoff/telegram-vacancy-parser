@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-@PropertySource("src/main/resources/application.properties")
+@PropertySource("classpath:/application.properties")
 public class ParserServiceResult extends Vacancy {
 
     private @Nullable String text;

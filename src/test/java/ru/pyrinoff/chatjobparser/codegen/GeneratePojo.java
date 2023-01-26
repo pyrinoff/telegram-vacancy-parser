@@ -1,4 +1,4 @@
-package ru.pyrinoff.chatjobparser.component;
+package ru.pyrinoff.chatjobparser.codegen;
 
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;

@@ -68,9 +68,11 @@ public class ParserService {
 
     @PostConstruct
     private void postLoad() {
-        System.out.println("Parsers: ");
-        salaryParserList.forEach(System.out::println);
-        System.out.println("Parsers end");
+        if(AbstractSalaryParser.DEBUG) {
+            System.out.println("Parsers: ");
+            salaryParserList.forEach(System.out::println);
+            System.out.println("Parsers end");
+        }
     }
 
     @SneakyThrows
@@ -118,7 +120,7 @@ public class ParserService {
         final @Nullable String fileContent = FileUtils.fileGetContentAsString(chatExportJsonFilepath);
         if (fileContent == null) throw new RuntimeException("No content in json file: " + chatExportJsonFilepath);
         chatExportJson = JsonUtil.jsonToObject(fileContent, ChatExportJson.class);
-        System.out.println("Loaded fron file: " + chatExportJson.getMessages().size());
+        System.out.println("Loaded from file: " + chatExportJson.getMessages().size());
     }
 
     public void filterById(@NotNull final Integer messageId) {
@@ -172,6 +174,7 @@ public class ParserService {
         parseSalary(parserServiceResult);
         parseMarkers(parserServiceResult);
         parseWords(parserServiceResult);
+        parserServiceResult.setMessageId(message.getId());
         return parserServiceResult;
     }
 
@@ -215,6 +218,8 @@ public class ParserService {
         vacancy.setCurrency(parserServiceResult.getCurrency());
         vacancy.setMarkers(parserServiceResult.getMarkers());
         vacancy.setWords(parserServiceResult.getWords());
+        vacancy.setWithPrediction(parserServiceResult.getWithPrediction());
+        vacancy.setMessageId(parserServiceResult.getMessageId());
         return vacancy;
     }
 

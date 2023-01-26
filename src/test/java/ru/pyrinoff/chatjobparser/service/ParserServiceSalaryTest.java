@@ -37,6 +37,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(3000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(null, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -48,6 +49,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(2500, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(null, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -59,6 +61,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(3000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(5000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -71,6 +74,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(3000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(5000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -83,6 +87,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(3000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(5000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -95,6 +100,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(3000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(5000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
 
@@ -108,6 +114,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(3000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(5000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -120,6 +127,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(100000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(null, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(true, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -132,6 +140,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(100000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(150000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -144,6 +153,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(160000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(190000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -156,6 +166,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(250000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(350000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(true, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -168,6 +179,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(180000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(260000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -180,6 +192,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(2000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(null, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -192,12 +205,12 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(2500, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(null, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
 
     @Test
     public void parseSalary15() {
-
         @NotNull final String text = "Зарплата: 100 000р. – 150 000р. ";
         @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
         parserServiceResult.setText(cleanupText(text));
@@ -205,11 +218,11 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(100000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(150000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
     public void parseSalary16() {
-
         @NotNull final String text = "   занятость полная зарплатная вилка 250.000 300.000 net оформление по ип проект с";
         @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
         parserServiceResult.setText(cleanupText(text));
@@ -217,11 +230,11 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(250000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(300000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(true, parserServiceResult.getWithPrediction());
     }
 
     @Test
     public void parseSalary17() {
-
         @NotNull final String text = "командой ❤️ carprice \uD83D\uDCB0з/п 170 000 250 000 руб. \uD83D\uDDA5гибрид/офис алмата \uD83C\uDF1Fсерв\t";
         @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
         parserServiceResult.setText(cleanupText(text));
@@ -229,11 +242,11 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(170000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(250000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
     public void parseSalary18() {
-
         @NotNull final String text = "оты. зп 1500 2300$ net т";
         @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
         parserServiceResult.setText(cleanupText(text));
@@ -241,11 +254,11 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(1500, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(2300, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
     public void parseSalary19() {
-
         @NotNull final String text = " зарплатная вилка от 40 до 80к нетто опыт работы без опыта требовани";
         @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
         parserServiceResult.setText(cleanupText(text));
@@ -253,6 +266,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(40000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(80000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(true, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -265,6 +279,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(180000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(180000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(true, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -277,6 +292,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(200000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(250000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -289,6 +305,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(200000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(300000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -301,6 +318,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(null, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(250000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(true, parserServiceResult.getWithPrediction());
     }
 
 
@@ -314,6 +332,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(3000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(null, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -326,6 +345,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(4500, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(null, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -338,6 +358,7 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(5500, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(7000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.USD, parserServiceResult.getCurrency());
+        Assertions.assertEquals(false, parserServiceResult.getWithPrediction());
     }
 
     @Test
@@ -358,10 +379,11 @@ public final class ParserServiceSalaryTest extends AbstractSpringTest {
         Assertions.assertEquals(230000, parserServiceResult.getSalaryFrom());
         Assertions.assertEquals(230000, parserServiceResult.getSalaryTo());
         Assertions.assertEquals(CurrencyEnum.RUB, parserServiceResult.getCurrency());
+        Assertions.assertEquals(true, parserServiceResult.getWithPrediction());
     }
 
     @Test
-    public void parsecleanupText() {
+    public void parserCleanupText() {
         Assertions.assertEquals("от 3000", cleanupText("от 3.000"));
         Assertions.assertEquals("от 200000", cleanupText("от 200 000"));
         Assertions.assertEquals("200000 300000", cleanupText("200. 000 300.000"));

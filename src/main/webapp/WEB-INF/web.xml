@@ -6,9 +6,10 @@
 
   <servlet-mapping>
     <servlet-name>default</servlet-name>
+<!--    <url-pattern>/index.html</url-pattern>-->
     <url-pattern>/includes/*</url-pattern>
   </servlet-mapping>
 
-  <absolute-ordering/>
-  <display-name>Job parser</display-name>
+ <!-- <absolute-ordering/>
+  <display-name>Job parser</display-name>-->
 </web-app>
