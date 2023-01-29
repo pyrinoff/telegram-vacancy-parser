@@ -50,8 +50,15 @@ public class UploadController {
             return modelAndView;
         }
         new Thread(() -> {
-            parserService.parseVacancies(uploadedFile.getAbsolutePath(), null, true);
-            uploadedFile.delete();
+            try {
+                parserService.parseVacancies(uploadedFile.getAbsolutePath(), null, true);
+            }
+            catch (@NotNull final Exception e) {
+                log.info(e.toString());
+            }
+            finally {
+                uploadedFile.delete();
+            }
 
         }).start();
         modelAndView.addObject("message", "Файл загружен и поставлен на обработку: "+uploadedFile);

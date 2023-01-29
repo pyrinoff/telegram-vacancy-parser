@@ -1,0 +1,17 @@
+# /etc/systemd/system/docker-compose-autostart.service
+
+[Unit]
+Description=My Docker Compose Autostart Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/docker
+ExecStart=/bin/bash docker_up.sh
+ExecStop=/usr/local/bin/docker-compose down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

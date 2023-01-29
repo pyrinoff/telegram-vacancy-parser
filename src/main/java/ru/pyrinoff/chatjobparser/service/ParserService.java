@@ -159,6 +159,14 @@ public class ParserService {
         LAST_PROCESSING_RESULT = true;
         vacancyService.recalculateStatData();
         System.out.println("Stop parse vacancies");
+        cleanupMemory();
+    }
+
+    private void cleanupMemory() {
+        parserServiceResultList.clear();
+        parserServiceResultSet.clear();
+        chatExportJson = null;
+        System.gc();
     }
 
     @SneakyThrows
@@ -185,6 +193,7 @@ public class ParserService {
             }
         }
         System.out.println("Parsing ended, processed: " + chatExportJson.getMessages().size() + ", stored: " + parserServiceResultList.size());
+        chatExportJson = null; //clean memory
     }
 
     @SneakyThrows
@@ -233,6 +242,7 @@ public class ParserService {
         if (parserServiceResultList == null || parserServiceResultList.isEmpty()) return;
         parserServiceResultSet = new HashSet<>(parserServiceResultList);
         System.out.println("Duplicates ok, before: " + parserServiceResultList.size() + ", after: " + parserServiceResultSet.size());
+        parserServiceResultList.clear(); //clear memory
     }
 
     private @Nullable Vacancy mapResultToVacancy(@Nullable final ParserServiceResult parserServiceResult) {
@@ -260,6 +270,7 @@ public class ParserService {
         System.out.println("Mapped parsed results to vacancy: "+vacancies.size());
         vacancyService.addAll(vacancies);
         System.out.println("Saved to DB.");
+        parserServiceResultSet.clear();
     }
 
 }

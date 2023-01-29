@@ -55,7 +55,7 @@ public abstract class AbstractSalaryParser {
             @NotNull final CurrencyEnum currency,
             @NotNull final Integer value,
             boolean smallRange) {
-        System.out.println("Check salary for range, currency "+currency+", value: "+value+", small range: "+smallRange);
+        if(DEBUG) System.out.println("Check salary for range, currency "+currency+", value: "+value+", small range: "+smallRange);
         if (smallRange) {
             if (currency == CurrencyEnum.RUB && isValueInRange(value, 15000, 450000)) return true;
             if (currency == CurrencyEnum.USD && isValueInRange(value, 1000, 7000)) return true;

@@ -10,36 +10,26 @@ services:
       - ./postgres:/var/lib/postgresql/data
     hostname: postgres
     ports:
-      - $PORT_OUT_POSTGRES:5432
+      - ${PORT_OUT_POSTGRES}:5432
     env_file:
       - .env
-    restart: unless-stopped
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    hostname: pgadmin
-    ports:
-      - $PORT_OUT_PGADMIN:80
-    env_file:
-      - .env
-    depends_on:
-      - postgres
     restart: unless-stopped
 
   tomcat:
-    image: tomcat-jobstat:latest
+    image: registry.gitlab.com/pyrinoff/chat-job-parser/chat-job-parser:latest
     container_name: tomcat
     hostname: tomcat
+    env_file:
+      - .env
     environment:
       database.url: jdbc:postgresql://postgres:5432/jp
-      database.user: $POSTGRES_USER
-      database.password: $POSTGRES_PASSWORD
+      database.user: ${POSTGRES_USER}
+      database.password: ${POSTGRES_PASSWORD}
+      CATALINA_OPTS: "-Xmx1024m"
     ports:
-      - $PORT_OUT_APP:8080
+      - ${PORT_OUT_APP}:8080
     depends_on:
       - postgres
-    #restart: unless-stopped
 
   ouroboros:
     image: pyouroboros/ouroboros
