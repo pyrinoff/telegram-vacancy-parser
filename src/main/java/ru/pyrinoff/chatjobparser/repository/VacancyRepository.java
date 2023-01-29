@@ -10,16 +10,24 @@ import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Repository
 public interface VacancyRepository extends JpaRepository<Vacancy, String>, VacancyRepositoryCustom {
 
-    @Query("SELECT MAX(v.date) FROM Vacancy v")
+    //@Query("SELECT MAX(v.date) FROM Vacancy v")
+    @Query(value="SELECT MAX(v.date) FROM vacancy v", nativeQuery = true)
     Date getLastVacancyDate();
+
+    @Query(value="SELECT DISTINCT markers FROM vacancy_markers", nativeQuery = true)
+    TreeSet<String> getMarkersList();
+
+    @Query(value="SELECT DISTINCT words FROM vacancy_words", nativeQuery = true)
+    TreeSet<String> getWordsList();
+
+    //@Query(value="DELETE FROM vacancy_markers; DELETE from vacancy_words; DELETE FROM vacancy", nativeQuery = true)
+    //void removeALl();
+
 
 }

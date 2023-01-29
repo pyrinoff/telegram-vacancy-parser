@@ -1,12 +1,14 @@
 package ru.pyrinoff.chatjobparser.service;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.model.dto.SqlOperatorEnum;
 import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
 import ru.pyrinoff.chatjobparser.model.endpoint.DatasetRequest;
 import ru.pyrinoff.chatjobparser.model.endpoint.DatasetResponse;
@@ -14,10 +16,37 @@ import ru.pyrinoff.chatjobparser.model.endpoint.OneLineRequest;
 import ru.pyrinoff.chatjobparser.model.endpoint.SalarySettings;
 import ru.pyrinoff.chatjobparser.repository.VacancyRepository;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
+@Slf4j
 @Service
 public class VacancyService {
+
+    @Getter
+    private long DB_ROWS_COUNT;
+
+    @Getter
+    private Date DB_LAST_VACANCY_DATE;
+
+    @Getter
+    private TreeSet<String> MARKERS;
+
+    @Getter
+    private TreeSet<String> WORDS;
+
+    @PostConstruct
+    public void postConstruct() {
+        recalculateStatData();
+    }
+
+    public void recalculateStatData() {
+        log.info("(Re)Calculating stat data...");
+        DB_ROWS_COUNT = getRowsCount();
+        DB_LAST_VACANCY_DATE = getLastVacancyDate();
+        MARKERS = getMarkersList();
+        WORDS = getWordsList();
+    }
 
     @Getter
     @Autowired
@@ -75,7 +104,9 @@ public class VacancyService {
         @NotNull final OneLineRequest oneLine = request.getLines().get(index);
 
         @Nullable final List<String> markers = oneLine.getMarkers() != null ? oneLine.getMarkers() : Collections.emptyList();
+        @NotNull final SqlOperatorEnum markersOperator = oneLine.getMarkersOperator();
         @Nullable final List<String> words = oneLine.getWords() != null ? oneLine.getWords() : Collections.emptyList();
+        @NotNull final SqlOperatorEnum wordsOperator = oneLine.getWordsOperator();
         @Nullable final Date periodFrom = oneLine.getPeriodFrom();
         @Nullable final Date periodTo = oneLine.getPeriodTo();
         @NotNull final SalarySettings salary = oneLine.getSalary();
@@ -89,10 +120,12 @@ public class VacancyService {
 
         @NotNull final CurrencyEnum currency = request.getSalaryCurrency();
 
-        return repository.getStatistic(
+        @NotNull Map<Integer, Integer> statistic = repository.getStatistic(
                 markers, words, periodFrom, periodTo, salaryFrom, salaryTo, fromBorder, toBorder, bothBorders, allowPredicted,
-                currency
+                currency, markersOperator, wordsOperator
         );
+        if(statistic.size() == 0) statistic.put(0,0); //отправляем нули, если ничего не найдено
+        return statistic;
     }
 
     //Traverse List<Map<Integer,Integer>> to Object[][]
@@ -126,6 +159,7 @@ public class VacancyService {
             }
             finalDataset[index++] = oneLine.toArray();
         }
+
         return finalDataset;
     }
 
@@ -140,6 +174,23 @@ public class VacancyService {
     public Date getLastVacancyDate() {
         @NotNull final Date lastVacancyDate = repository.getLastVacancyDate();
         return lastVacancyDate;
+    }
+
+    public @NotNull TreeSet<String> getMarkersList() {
+        TreeSet<String> markers = repository.getMarkersList();
+        if(markers == null) return new TreeSet<String>();
+        return markers;
+    }
+
+
+    public @NotNull TreeSet<String> getWordsList() {
+        TreeSet<String> words = repository.getWordsList();
+        if(words == null) return new TreeSet<String>();
+        return words;
+    }
+
+    public void removeAll() {
+        repository.deleteAll();
     }
 
 }

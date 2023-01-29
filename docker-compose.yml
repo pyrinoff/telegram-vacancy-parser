@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+
+  #DATABASES
+  postgres:
+    image: postgres
+    container_name: postgres
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    hostname: postgres
+    ports:
+      - $PORT_OUT_POSTGRES:5432
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    hostname: pgadmin
+    ports:
+      - $PORT_OUT_PGADMIN:80
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  tomcat:
+    image: tomcat-jobstat:latest
+    container_name: tomcat
+    hostname: tomcat
+    environment:
+      database.url: jdbc:postgresql://postgres:5432/jp
+      database.user: $POSTGRES_USER
+      database.password: $POSTGRES_PASSWORD
+    ports:
+      - $PORT_OUT_APP:8080
+    depends_on:
+      - postgres
+    #restart: unless-stopped
+
+  ouroboros:
+    image: pyouroboros/ouroboros
+    hostname: ouroboros
+    container_name: ouroboros
+    environment:
+      - CLEANUP=true
+      - INTERVAL=300
+      - LOG_LEVEL=info
+      - SELF_UPDATE=true
+      - TZ=Europe/Moscow
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  default:

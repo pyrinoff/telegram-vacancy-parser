@@ -21,10 +21,13 @@ public abstract class AbstractSalaryParser {
     public static final @NotNull String CAN_BE_WHITESPACE = "[\\s]{0,1}";
     public static final @NotNull String PATTERN_PART_ONE_BORDER = "([1-9]{1}[\\d]{1,5}|[1-9]{1}[.]{0,1}[\\d]{0,1})";
     public static final @NotNull String PATTERN_PART_K = "(к|k|тыс\\.|тыс|т\\.|т){0,1}";
-    public static final @NotNull String PATTERN_PART_CURRENCY = "(\\$|USD|руб\\.|руб|р|р\\.|rub|eur|долларов|€|euro|usd|rur)";
+    public static final @NotNull String PATTERN_PART_CURRENCY = "(\\$|USD|руб\\.|руб|р|р\\.|rub|eur|долларов|€|euro|usd|rur|евро)";
     public static final @NotNull String PATTERN_PART_CURRENCY_REQ = PATTERN_PART_CURRENCY + "{1}";
     public static final @NotNull String PATTERN_PART_CURRENCY_NONREQ = PATTERN_PART_CURRENCY + "{0,1}";
-    public static final @NotNull String PATTERN_PART_CURRENCY_OR_WORD_REQ = "(\\$|USD|руб\\.|руб|р|р\\.|rub|eur|долларов|€|euro|usd|rur|net|нетто|на руки|в месяц|месяц){1}";
+    public static final @NotNull String PATTERN_PART_CURRENCY_OR_WORD_REQ = "(\\$|USD|руб\\.|руб|р|р\\.|rub|eur|долларов|€|euro|usd|rur|net|нетто|на руки|в месяц|месяц|евро){1}";
+
+    public static final @NotNull String TO_PATTERN = "(до|-|–| |—|-)";
+
     public static boolean DEBUG = false;
 
     protected static @Nullable CurrencyEnum getCurrencyByString(@Nullable final String currencyString) {
@@ -34,6 +37,7 @@ public abstract class AbstractSalaryParser {
                         || currencyString.equals("usd")
                         || currencyString.equals("eur")
                         || currencyString.equals("euro")
+                        || currencyString.equals("евро")
                         || currencyString.startsWith("доллар")
                         || currencyString.startsWith("€")
         )
@@ -47,9 +51,19 @@ public abstract class AbstractSalaryParser {
         return null;
     }
 
-    protected static boolean isSalaryLooksNormal(@NotNull final CurrencyEnum currency, @NotNull final Integer value) {
-        if (currency == CurrencyEnum.RUB && isValueInRange(value, 15000, 1000000)) return true;
-        if (currency == CurrencyEnum.USD && isValueInRange(value, 300, 10000)) return true;
+    protected static boolean isSalaryLooksNormal(
+            @NotNull final CurrencyEnum currency,
+            @NotNull final Integer value,
+            boolean smallRange) {
+        System.out.println("Check salary for range, currency "+currency+", value: "+value+", small range: "+smallRange);
+        if (smallRange) {
+            if (currency == CurrencyEnum.RUB && isValueInRange(value, 15000, 450000)) return true;
+            if (currency == CurrencyEnum.USD && isValueInRange(value, 1000, 7000)) return true;
+        } else {
+            if (currency == CurrencyEnum.RUB && isValueInRange(value, 15000, 800000)) return true;
+            if (currency == CurrencyEnum.USD && isValueInRange(value, 300, 12000)) return true;
+        }
+        if (DEBUG) System.out.println("Salary looks like NOT normal!");
         return false;
     }
 
@@ -66,9 +80,11 @@ public abstract class AbstractSalaryParser {
             , boolean isRequiredThousand
     ) {
         @NotNull final String pattern = getPattern();
+        if(DEBUG) System.out.println("PATTERN: "+pattern);
 
         @NotNull final Map<Integer, List<String>> matches = RegexUtils.getMatches(text, pattern);
         if (matches == null) return null;
+        if(DEBUG) System.out.println(matches);
 
         @NotNull final List<SalaryParserResult> salaryParserResultList = new ArrayList<>();
 
@@ -77,7 +93,7 @@ public abstract class AbstractSalaryParser {
             @NotNull final SalaryParserResult salaryParserResult = new SalaryParserResult();
 
             @Nullable final SalaryParserData salaryParserData = parseOneMatch(matches.get(i));
-            if(salaryParserData == null) {
+            if (salaryParserData == null) {
                 System.out.println("Cant parse that match... Skip");
                 continue;
             }
@@ -91,20 +107,21 @@ public abstract class AbstractSalaryParser {
             }
 
             if (isRequiredFromTo && salaryParserData.getWordFrom() == null && salaryParserData.getWordTo() == null) {
-                if(DEBUG) System.out.println("Skip by strict getFromWord/getToWord");
+                if (DEBUG) System.out.println("Skip by strict getFromWord/getToWord");
                 continue;
             }
 
             @Nullable final String currencyString = salaryParserData.getCurrencyTo() != null ? salaryParserData.getCurrencyTo() : salaryParserData.getCurrencyFrom();
             @Nullable final CurrencyEnum currency = getCurrencyByString(currencyString);
             if (isRequiredCurrency && (currencyString == null || currency == null)) {
-                if(DEBUG) System.out.println("Skip by strict currencyFrom/currencyTo/currency");
+                if (DEBUG) System.out.println("Skip by strict currencyFrom/currencyTo/currency");
                 continue;
             }
+            if(DEBUG) System.out.println("Final currency: " + currency);
 
             @Nullable final String thousandString = salaryParserData.getThousandTo() != null ? salaryParserData.getThousandTo() : salaryParserData.getThousandFrom();
             if (isRequiredThousand && (thousandString == null || thousandString.isEmpty())) {
-                if(DEBUG) System.out.println("Skip by strict thousand");
+                if (DEBUG) System.out.println("Skip by strict thousand");
                 continue;
             }
 
@@ -114,8 +131,9 @@ public abstract class AbstractSalaryParser {
             Integer valueToInt = null;
 
             if (salaryParserData.getValueFrom() != null) {
-                @Nullable Float valueFromFloat = NumberUtil.parseFloat(salaryParserData.getValueFrom());
-                if(valueFromFloat == null) {
+                if(DEBUG) System.out.println("Checking 'From' value for range...");
+                @Nullable Float valueFromFloat = NumberUtil.parseFloat(salaryParserData.getValueFrom(), 7);
+                if (valueFromFloat == null) {
                     System.out.println("Float parsing error??!!");
                     continue;
                 }
@@ -124,8 +142,9 @@ public abstract class AbstractSalaryParser {
             }
 
             if (salaryParserData.getValueTo() != null) {
-                @Nullable Float valueToFloat = NumberUtil.parseFloat(salaryParserData.getValueTo());
-                if(valueToFloat == null) {
+                if(DEBUG) System.out.println("Checking 'To' value for range...");
+                @Nullable Float valueToFloat = NumberUtil.parseFloat(salaryParserData.getValueTo(), 7);
+                if (valueToFloat == null) {
                     System.out.println("Float parsing error??!!");
                     continue;
                 }
@@ -133,8 +152,8 @@ public abstract class AbstractSalaryParser {
                 valueToInt = Math.round(valueToFloat);
             }
 
-            if(valueFromInt != null && valueToInt !=null && valueFromInt > valueToInt) {
-                if(DEBUG) System.out.println("From greater than to, skip it!");
+            if (valueFromInt != null && valueToInt != null && valueFromInt > valueToInt) {
+                if (DEBUG) System.out.println("From greater than to, skip it!");
                 continue;
             }
 
@@ -143,10 +162,9 @@ public abstract class AbstractSalaryParser {
             salaryParserResult.setTo(valueToInt);
 
             if (currency != null) {
-                if (valueFromInt != null && !isSalaryLooksNormal(currency, valueFromInt)
-                        || valueToInt != null && !isSalaryLooksNormal(currency, valueToInt)
+                if (valueFromInt != null && !isSalaryLooksNormal(currency, valueFromInt, false)
+                        || valueToInt != null && !isSalaryLooksNormal(currency, valueToInt, false)
                 ) {
-                    if(DEBUG) System.out.println("Salary looks like innormal, skip!");
                     continue;
                 }
                 //found correct result
@@ -165,19 +183,13 @@ public abstract class AbstractSalaryParser {
     protected static @Nullable SalaryParserResult predictCurrency(@NotNull final List<SalaryParserResult> salaryParserResultList) {
         if (DEBUG) System.out.println("Predicting currency...");
         for (@NotNull final SalaryParserResult oneSalaryParserResult : salaryParserResultList) {
-            if ((oneSalaryParserResult.getFrom() != null && isSalaryLooksNormal(CurrencyEnum.RUB, oneSalaryParserResult.getFrom()))
-                    || (oneSalaryParserResult.getTo() != null && isSalaryLooksNormal(CurrencyEnum.RUB, oneSalaryParserResult.getTo()))
-            ) {
-                if (DEBUG) System.out.println("Salary DOES looks like RUB!");
-                oneSalaryParserResult.setCurrencyEnum(CurrencyEnum.RUB);
-                oneSalaryParserResult.setWithPrediction(true);
-                return oneSalaryParserResult;
-            }
-            if ((oneSalaryParserResult.getFrom() != null && isSalaryLooksNormal(CurrencyEnum.USD, oneSalaryParserResult.getFrom()))
-                    || (oneSalaryParserResult.getTo() != null && isSalaryLooksNormal(CurrencyEnum.USD, oneSalaryParserResult.getTo()))
-            ) {
-                if (DEBUG) System.out.println("Salary DOES looks like USD!");
-                oneSalaryParserResult.setCurrencyEnum(CurrencyEnum.USD);
+            for (@NotNull final CurrencyEnum oneCurrency : CurrencyEnum.values()) {
+                if (oneSalaryParserResult.getFrom() != null && !isSalaryLooksNormal(oneCurrency, oneSalaryParserResult.getFrom(), true))
+                    continue;
+                if (oneSalaryParserResult.getTo() != null && !isSalaryLooksNormal(oneCurrency, oneSalaryParserResult.getTo(), true))
+                    continue;
+                if (DEBUG) System.out.println("Salary DOES looks like " + oneCurrency + "!");
+                oneSalaryParserResult.setCurrencyEnum(oneCurrency);
                 oneSalaryParserResult.setWithPrediction(true);
                 return oneSalaryParserResult;
             }
@@ -186,7 +198,7 @@ public abstract class AbstractSalaryParser {
     }
 
     @Override public String toString() {
-        return this.getClass().getSimpleName()+", REGEX:\n"+getPattern();
+        return this.getClass().getSimpleName() + ", REGEX:\n" + getPattern();
     }
 
 }

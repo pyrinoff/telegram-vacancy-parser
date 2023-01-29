@@ -1,6 +1,6 @@
 var globalChartData;
 var gChartOptions = {
-    title: 'Company Performance',
+    title: 'График количества вакансий к зарплате',
     curveType: 'function',
     legend: {position: 'bottom'},
     //colors: ['red', 'blue', 'orange']
@@ -8,17 +8,25 @@ var gChartOptions = {
 var gChartObject;
 let gLinesCount;
 let gLinesEnabledState = [];
-const gDebugRequest = true;
+const gDebugRequest = false;
+const gDefaultRange = 'lastThreeMonths';
 
 function initializeLinesDefaults() {
-    gLinesCount =  document.querySelectorAll("fieldset").length;
+    gLinesCount = document.querySelectorAll("fieldset").length;
 
     //Set state to enabled
-    for(i=0;i<gLinesCount;i++)  gLinesEnabledState[i] = false;
-    gLinesEnabledState[0] = true;
+    for (i = 0; i < gLinesCount; i++) {
+        gLinesEnabledState[i] = i === 0 ? true : false;
+        switchEnabledAlert(i, !gLinesEnabledState[i]);
+    }
+
 
     //setDate to current month
-    for(i = 0; i< gLinesCount; i++)   setDateRange('currentMonth', i);
+    for (i = 0; i < gLinesCount; i++) {
+        setDateRange(gDefaultRange, i);
+        let element = document.querySelector('input.dateRange-'+i+'-'+gDefaultRange);
+        if(element!=null) element.checked = true;
+    }
 }
 
 function redrawWithNewData(arrayData) {
@@ -30,8 +38,8 @@ function redrawWithNewData(arrayData) {
 function drawChart() {
     view = new google.visualization.DataView(globalChartData);
 
-    for(i=0;i<gLinesCount;i++) {
-        if (gLinesEnabledState[i] === false) view.hideColumns([i+1]);
+    for (i = 0; i < gLinesCount; i++) {
+        if (gLinesEnabledState[i] === false) view.hideColumns([i + 1]);
     }
     //if (optionalView == null) gChartObject.draw(globalChartData, gChartOptions);
     gChartObject.draw(view, gChartOptions);
@@ -42,11 +50,19 @@ function switchChartLineVisibility(index, toggleToState) {
     drawChart();
 }
 
+function switchEnabledAlert(index, toggleToState) {
+    let element = document.querySelector('fieldset[data-line-index="' + index + '"] div.enabledAlert');
+    if (!toggleToState) element.classList.add('d-none');
+    else element.classList.remove('d-none');
+}
+
+
+
 
 function addTextToInfo(someString) {
     if (typeof someString === 'object' && !Array.isArray(someString) && someString !== null) someString = JSON.stringify(someString, null, 2);
     var contentBlock = document.getElementById("info-block");
-    if(contentBlock == null) return;
+    if (contentBlock == null) return;
     var newLine = document.createElement("p");
     newLine.innerHTML = '<pre>' + someString + '</pre>';
     contentBlock.appendChild(newLine);
@@ -54,7 +70,7 @@ function addTextToInfo(someString) {
 
 function sendRequestFunc() {
     var requestData = getDataFromForm();
-    if(gDebugRequest) addTextToInfo(requestData);
+    if (gDebugRequest) addTextToInfo(requestData);
 
     fetch('./api/dataset', {
         method: 'POST',
@@ -66,7 +82,8 @@ function sendRequestFunc() {
         .then(response => {
             // do something with the response
             redrawWithNewData(response.dataset);
-            if(gDebugRequest) addTextToInfo(response);
+            calculateLinesInfo(response);
+            if (gDebugRequest) addTextToInfo(response);
         });
 }
 
@@ -122,7 +139,7 @@ function getDataFromForm() {
     var fieldsets = document.querySelectorAll("fieldset");
     var fieldsetsCount = fieldsets.length;
 
-    for(i=0;i<fieldsetsCount;i++) {
+    for (i = 0; i < fieldsetsCount; i++) {
         //send null if line is disabled
         if (gLinesEnabledState[i] === false) {
             formData["lines"].push(null);
@@ -134,7 +151,9 @@ function getDataFromForm() {
 
         var fieldsetData = {
             "markers": extractAsArray(oneFieldset, 'input[name="markers"]:checked'),
+            "markersOperator": extractAsString(document, 'input[name="markersOperator'+i+'"]:checked'),
             "words": extractAsArray(oneFieldset, 'input[name="words"]:checked'),
+            "wordsOperator": extractAsString(document, 'input[name="wordsOperator'+i+'"]:checked'),
             "salary": {
                 "fromBorder": hasSuchElements(oneFieldset, 'input[name="fromBorder"]:checked'),
                 "toBorder": hasSuchElements(oneFieldset, 'input[name="toBorder"]:checked'),
@@ -160,20 +179,25 @@ function onReady() {
     google.charts.setOnLoadCallback(onReady2);
 }
 
+function getDatasetIndex(node) {
+    return parseInt(node.closest('fieldset[data-line-index]').dataset.lineIndex);
+}
+
 function setupToggleLines() {
     var lineSwitcherCheckboxes = document.querySelectorAll('input[type="checkbox"][name="enabled"]');
     lineSwitcherCheckboxes.forEach(function (oneCheckbox) {
         oneCheckbox.addEventListener('change', function () {
-            var columnIndex = parseInt(oneCheckbox.closest('fieldset[data-line-index]').dataset.lineIndex);
+            var columnIndex = getDatasetIndex(oneCheckbox);
             var isChecked = oneCheckbox.checked;
             switchChartLineVisibility(columnIndex, isChecked);
+            switchEnabledAlert(columnIndex, !isChecked);
         });
     });
 }
 
 function setupToggleCards() {
     //Line cards switch
-    var buttons = document.querySelectorAll("button[data-toggle]");
+    var buttons = document.querySelectorAll("a[data-toggle]");
     var cards = document.querySelectorAll(".linesCard");
 
     for (var i = 0; i < buttons.length; i++) {
@@ -181,12 +205,14 @@ function setupToggleCards() {
             var cardId = this.getAttribute("data-toggle");
             cards.forEach(card => {
                 card.classList.remove('d-none');
-                if(cardId !== card.id) card.classList.add('d-none');
+                if (cardId !== card.id) card.classList.add('d-none');
             });
             buttons.forEach(oneButton => {
-                oneButton.classList.remove('active', 'btn-light', 'btn-dark');
-                if(oneButton === this) oneButton.classList.add('active', 'btn-dark');
-                else oneButton.classList.add('active', 'btn-light');
+                //oneButton.classList.remove('active', 'btn-light', 'btn-dark');
+                //if(oneButton === this) oneButton.classList.add('active', 'btn-dark');
+                //else oneButton.classList.add('active', 'btn-light');
+                oneButton.classList.remove('active');
+                if (oneButton === this) oneButton.classList.add('active');
             });
 
         });
@@ -215,7 +241,7 @@ function onReady2() {
 
 function showCustomYearDiv(show, index) {
     let element = document.querySelector('fieldset[data-line-index="' + index + '"] div.customPeriod');
-    if(element == null) {
+    if (element == null) {
         addTextToInfo("ERROR: cant find custom year div!");
         return;
     }
@@ -224,15 +250,15 @@ function showCustomYearDiv(show, index) {
 
 }
 
-function setDateRange(period, index) {
-    showCustomYearDiv(false, index);
+function setDateRange(period, index, minusYear) {
+    // showCustomYearDiv(false, index);
     let elementFrom = document.querySelector('fieldset[data-line-index="' + index + '"] div.customPeriod input[name="periodFrom"]');
-    if(elementFrom == null) {
+    if (elementFrom == null) {
         addTextToInfo("ERROR: cant find periodFrom element!");
         return;
     }
     let elementTo = document.querySelector('fieldset[data-line-index="' + index + '"] div.customPeriod input[name="periodTo"]');
-    if(elementTo == null) {
+    if (elementTo == null) {
         addTextToInfo("ERROR: cant find periodTo element!");
         return;
     }
@@ -249,18 +275,18 @@ function setDateRange(period, index) {
             return;
         }
         case 'lastThreeMonths': {
-            elementFrom.value = getDateMinusMonths(3, 'start').yyyymmdd();
-            elementTo.value = getDateMinusMonths(1, 'end').yyyymmdd();
+            elementFrom.value = getDateMinusDays(90).yyyymmdd();
+            elementTo.value = (new Date).yyyymmdd();
             return;
         }
         case 'lastSixMonths': {
-            elementFrom.value = getDateMinusMonths(6, 'start').yyyymmdd();
-            elementTo.value = getDateMinusMonths(1, 'end').yyyymmdd();
+            elementFrom.value = getDateMinusDays(180).yyyymmdd();
+            elementTo.value = (new Date).yyyymmdd();
             return;
         }
         case 'lastYear': {
-            elementFrom.value = getDateMinusYears(1, 'start').yyyymmdd();
-            elementTo.value = getDateMinusMonths(1, 'end').yyyymmdd();
+            elementFrom.value = getDateMinusDays(365).yyyymmdd();
+            elementTo.value = (new Date).yyyymmdd();
             return;
         }
         case 'currentYear': {
@@ -281,6 +307,93 @@ function setDateRange(period, index) {
         case 'all': {
             elementFrom.value = null;
             elementTo.value = null;
+            return;
+        }
+        case 'custom': {
+            showCustomYearDiv(true, index);
+            return;
+        }
+        case 'january': {
+            var startDate = getMonthStartOrEnd(1, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(1, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'february': {
+            var startDate = getMonthStartOrEnd(2, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(2, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'march': {
+            var startDate = getMonthStartOrEnd(3, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(3, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'april': {
+            var startDate = getMonthStartOrEnd(4, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(4, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'may': {
+            var startDate = getMonthStartOrEnd(5, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(5, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'june': {
+            var startDate = getMonthStartOrEnd(6, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(6, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'july': {
+            var startDate = getMonthStartOrEnd(7, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(7, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'august': {
+            var startDate = getMonthStartOrEnd(8, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementTo.value = getMonthStartOrEnd(8, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'september': {
+            var startDate = getMonthStartOrEnd(9, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(9, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'october': {
+            var startDate = getMonthStartOrEnd(10, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(10, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'november': {
+            var startDate = getMonthStartOrEnd(11, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(11, minusYear, 'end').yyyymmdd();
+            return;
+        }
+        case 'december': {
+            var startDate = getMonthStartOrEnd(12, minusYear, 'start');
+            checkStartDate(startDate, index);
+            elementFrom.value = startDate.yyyymmdd();
+            elementTo.value = getMonthStartOrEnd(12, minusYear, 'end').yyyymmdd();
             return;
         }
     }
@@ -311,15 +424,98 @@ function getDateMinusYears(years, startOrEnd) {
     return date;
 }
 
-Date.prototype.yyyymmdd = function() {
+function getDateMinusDays(days) {
+    var date = new Date();
+    date.setDate(date.getDate() - days);
+    return date;
+}
+
+
+function getMonthStartOrEnd(month, yearMinus, startOrEnd) {
+    var date = new Date();
+    date.setFullYear(date.getFullYear() - yearMinus);
+    ;
+    if (startOrEnd === "start") {
+        date.setDate(1);
+        date.setMonth(month - 1);
+    } else if (startOrEnd === "end") {
+        date.setMonth(month);
+        date.setDate(0);
+    }
+    return date;
+}
+
+Date.prototype.yyyymmdd = function () {
     var mm = this.getMonth() + 1; // getMonth() is zero-based
     var dd = this.getDate();
 
     return [this.getFullYear(),
-        (mm>9 ? '' : '0') + mm,
-        (dd>9 ? '' : '0') + dd
+        (mm > 9 ? '' : '0') + mm,
+        (dd > 9 ? '' : '0') + dd
     ].join('-');
 };
+
+function checkStartDate(date, index) {
+    let element = document.querySelector('fieldset[data-line-index="' + index + '"] div.dateAlert');
+    if (date <= (new Date())) {
+        element.textContent = '';
+        element.classList.add('d-none');
+    }
+    else {
+        element.textContent = 'Стартовая дата превышает текущую!'
+        element.classList.remove('d-none');
+    }
+}
+
+function calculateLinesInfo(response) {
+    var dataset = response.dataset;
+    var currency = response.request.salaryCurrency;
+
+    //Get initial data
+    var linesNames = dataset[0];
+    var linesCount = dataset[0].length - 1; //0 for salary value
+    var rowCount = dataset.length; //0 is header
+    var content = '<ul>';
+    var roundMultiplier = currency === 'RUB' ? 1000 : 100;
+
+    //Foreach and collect data by line
+    for(i = 1; i<=linesCount; i++) {
+        var maxSalary = null;
+        var minSalary = null;
+        var sum = 0;
+        var vacancyCount = 0;
+        for(j = 1; j<rowCount; j++) {
+            var countOfVacanciesInRow = dataset[j][i];
+            if(countOfVacanciesInRow === 0) continue;
+            vacancyCount += countOfVacanciesInRow;
+            var vacancySalary = dataset[j][0];
+            sum += vacancySalary * countOfVacanciesInRow;
+            maxSalary = vacancySalary > maxSalary ? vacancySalary : maxSalary;
+            minSalary = vacancySalary < minSalary || minSalary == null ? vacancySalary : minSalary;
+        }
+        if(sum === 0) continue; //null lines
+        var midSalary = Math.round(sum / vacancyCount / roundMultiplier)*roundMultiplier;
+        content+=
+            '<li>Линия '
+            +i
+            +':  вакансий всего - '
+            + vacancyCount
+            +' шт, средняя ЗП - '
+            + midSalary
+            + ', минимальная - '
+            + minSalary
+            + ', максимальная - '
+            + maxSalary
+            +'</li>';
+    }
+    content +='</ul>'
+
+    //Show line
+    var element = document.querySelector('#linesInfo');
+    element.innerHTML = content;
+
+}
+
 
 function docReady(fn) {
     // see if DOM is already available

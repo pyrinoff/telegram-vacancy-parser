@@ -1,0 +1,36 @@
+image: docker:19.03.0
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+services:
+  - name: docker:19.03.0-dind
+
+stages:
+  - build
+  - publish
+
+build:
+  #https://hub.docker.com/_/maven/tags
+  image: maven:3.8.5-openjdk-17
+  stage: build
+  script:
+    - mvn clean install
+  artifacts:
+    when: always
+    paths:
+      - target/jobstat.war
+  only:
+    - master
+
+publish:
+  image: docker:19.03.0
+  stage: publish
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/chat-job-parser:latest .
+    - docker push $CI_REGISTRY_IMAGE/chat-job-parser:latest
+  only:
+    - master

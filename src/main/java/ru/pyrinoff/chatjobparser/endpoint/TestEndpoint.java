@@ -3,6 +3,7 @@ package ru.pyrinoff.chatjobparser.endpoint;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.*;
 import ru.pyrinoff.chatjobparser.model.endpoint.*;
+import ru.pyrinoff.chatjobparser.util.BytesFormatUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,42 +12,28 @@ import java.util.Date;
 @RequestMapping("/api")
 public class TestEndpoint {
 
-    @PostMapping("/test")
-    public String post(@RequestBody TestRequest request) {
-        return request.toString();
-    }
+   @GetMapping("/info")
+    private String info() {
+           final Runtime runtime = Runtime.getRuntime();
+           final long availableProcessors = runtime.availableProcessors();
+           final long freeMemory = runtime.freeMemory();
+           final String freeMemoryFormat = BytesFormatUtil.format(freeMemory);
+           final long maxMemory = runtime.maxMemory();
+           final boolean isMaxMemory = maxMemory == Long.MAX_VALUE;
+           final String maxMemoryFormat = isMaxMemory ? "no limit" : BytesFormatUtil.format(maxMemory);
+           final long totalMemory = runtime.totalMemory();
+           final String totalMemoryFormat = BytesFormatUtil.format(totalMemory);
+           final long usageMemory = totalMemory - freeMemory;
+           final String usageMemoryFormat = BytesFormatUtil.format(usageMemory);
 
-    @GetMapping("/test")
-    public DatasetRequest get() {
-        DatasetRequest datasetRequest = new DatasetRequest();
-
-        OneLineRequest oneLineRequest = new OneLineRequest();
-        oneLineRequest.setMarkers(new ArrayList<>(){{
-            add("some");
-            add("markers");
-        }});
-        oneLineRequest.setWords(new ArrayList<>(){{
-            add("some");
-            add("words");
-        }});
-        SalarySettings salarySettings = new SalarySettings();
-        salarySettings.setSalaryFrom(10);
-        salarySettings.setSalaryTo(10);
-        salarySettings.setToBorder(true);
-        salarySettings.setFromBorder(true);
-        salarySettings.setAllowPredicted(true);
-        salarySettings.setBothBorders(true);
-        oneLineRequest.setSalary(salarySettings);
-
-        oneLineRequest.setPeriodFrom(new Date());
-        oneLineRequest.setPeriodTo(new Date());
-
-        datasetRequest.setLines(new ArrayList<OneLineRequest>(){{
-            add(oneLineRequest);
-            }
-        });
-        return datasetRequest;
-
-    }
+           @NotNull final StringBuilder sb = new StringBuilder();
+           sb.append("[SYSTEM INFO]");
+           sb.append("Cores: " + availableProcessors);
+           sb.append("Free memory: " + freeMemoryFormat);
+           sb.append("Maximum memory: " + maxMemoryFormat);
+           sb.append("Total memory available to JVM: " + totalMemoryFormat);
+           sb.append("Usage: " + usageMemoryFormat);
+           return sb.toString();
+   }
 
 }

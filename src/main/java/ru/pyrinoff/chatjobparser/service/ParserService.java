@@ -2,6 +2,8 @@ package ru.pyrinoff.chatjobparser.service;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Service
+@Slf4j
 public class ParserService {
 
     private static boolean SHOW_TEXT_DURING_PARSE = false;
@@ -51,6 +54,10 @@ public class ParserService {
     private @NotNull List<AbstractMarkerParser> markerParserList;
 
     private @Nullable ChatExportJson chatExportJson;
+
+    private boolean PROCESSING_STATUS = false;
+
+    private Boolean LAST_PROCESSING_RESULT = null;
 
     @SneakyThrows
     public ParserService() {
@@ -133,11 +140,25 @@ public class ParserService {
     @SneakyThrows
     public void parseVacancies(@NotNull String filepath, @Nullable Integer filterById, final boolean writeToDb) {
         System.out.println("Starting parse vacancies");
-        parseFileToMemory(filepath);
-        if (filterById != null) filterById(filterById);
-        parseVacanciesFromTelegramHistory();
-        makeVacanciesUnique();
-        if (writeToDb) saveVacanciesToDb();
+        PROCESSING_STATUS = true;
+        LAST_PROCESSING_RESULT = null;
+        try {
+            parseFileToMemory(filepath);
+            if (filterById != null) filterById(filterById);
+            parseVacanciesFromTelegramHistory();
+            makeVacanciesUnique();
+            if (writeToDb) saveVacanciesToDb();
+        }
+        catch (@NotNull final Exception e) {
+            LAST_PROCESSING_RESULT = false;
+            throw e;
+        }
+        finally {
+            PROCESSING_STATUS = false;
+        }
+        LAST_PROCESSING_RESULT = true;
+        vacancyService.recalculateStatData();
+        System.out.println("Stop parse vacancies");
     }
 
     @SneakyThrows
@@ -191,11 +212,16 @@ public class ParserService {
         parserServiceResult.setText(text);
     }
 
-    private @Nullable String getTextFromTextList(@Nullable final List<TextEntity> textList, final boolean skipLinks) {
+    private @Nullable String getTextFromTextList(@Nullable final List<TextEntity> textList, final boolean skipNonImportantTypes
+    ) {
         if (textList == null || textList.isEmpty()) return null;
         StringBuilder sb = new StringBuilder();
         for (@NotNull final TextEntity oneText : textList) {
-            if (skipLinks && TextTypeEnum.getByValue(oneText.getType()) == TextTypeEnum.LINK) continue;
+            if (skipNonImportantTypes &&
+                    (TextTypeEnum.getByValue(oneText.getType()) == TextTypeEnum.LINK
+                            || TextTypeEnum.getByValue(oneText.getType()) == TextTypeEnum.PHONE
+                            || TextTypeEnum.getByValue(oneText.getType()) == TextTypeEnum.EMAIL)
+            ) continue;
             sb.append(oneText.getText());
         }
         if (sb.isEmpty()) return null;

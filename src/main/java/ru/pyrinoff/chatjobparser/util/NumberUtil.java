@@ -6,21 +6,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public interface NumberUtil {
 
     @SneakyThrows
-    static @Nullable Integer parseInt(@NotNull String integerString) {
-        return Integer.parseInt(integerString.replaceAll("[ .]", ""));
-    }
-
-    @SneakyThrows
-    static @Nullable Float parseFloat(@NotNull String floatOrIntegerString) {
+    static @Nullable Float parseFloat(@NotNull String floatOrIntegerString, int maxNumbersWithPointer) {
         @NotNull String partWithNumbers = floatOrIntegerString.replaceAll(",", ".");
-        partWithNumbers = partWithNumbers.replaceAll("[^0-9.]+", "");
+        partWithNumbers = partWithNumbers.replaceAll(" ", "");
+
+        Map<Integer, List<String>> matches = RegexUtils.getMatches(partWithNumbers, "^[0-9.]{1,"+maxNumbersWithPointer+"}");
+        if (matches == null || matches.get(0)==null || matches.get(0).get(0)==null) return null;
+        @NotNull String finalStringOfNumber = matches.get(0).get(0);
+
         try {
-            return Float.parseFloat(partWithNumbers);
+            return Float.parseFloat(finalStringOfNumber);
         } catch (NumberFormatException e) {
             return null;
         }

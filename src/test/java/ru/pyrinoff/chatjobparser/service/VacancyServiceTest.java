@@ -1,11 +1,16 @@
 package ru.pyrinoff.chatjobparser.service;
 
 import lombok.SneakyThrows;
+import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
+import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
+import ru.pyrinoff.chatjobparser.configuration.WebMvcConfiguration;
 import ru.pyrinoff.chatjobparser.util.JsonUtil;
 
 import java.util.ArrayList;
@@ -13,14 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ContextConfiguration(classes = { ApplicationConfiguration.class, WebMvcConfiguration.class })
 public class VacancyServiceTest extends AbstractSpringTest {
 
-
-    private static @NotNull VacancyService VACANCY_SERVICE;
+    @Autowired
+    private @NotNull VacancyService VACANCY_SERVICE;
 
     @BeforeAll
     public static void setUp() {
-        VACANCY_SERVICE = context.getBean(VacancyService.class);
     }
 
     @Test

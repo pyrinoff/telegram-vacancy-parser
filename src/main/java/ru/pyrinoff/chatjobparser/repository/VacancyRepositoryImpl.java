@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.model.dto.SqlOperatorEnum;
 import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
 
 import javax.persistence.EntityManager;
@@ -40,7 +41,9 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom  {
             @NotNull final Boolean toBorder,
             @NotNull final Boolean bothBorders,
             @NotNull final Boolean allowPredicted,
-            @NotNull final CurrencyEnum currency
+            @NotNull final CurrencyEnum currency,
+            @NotNull final SqlOperatorEnum markersOperator,
+            @NotNull final SqlOperatorEnum wordsOperator
     ) {
         String hql =
                 "SELECT tSubTable.salary, tSubTable.cnt FROM (" +
@@ -55,15 +58,21 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom  {
                         ", " + getCurrencyRounder(currency) + ") as salary," +
                         " COUNT(distinct messageid) as cnt" +
                         " FROM vacancy v" +
-                        " LEFT JOIN vacancy_markers vm ON v.messageid = vm.vacancy_messageid" +
-                        " LEFT JOIN vacancy_words vw ON v.messageid = vw.vacancy_messageid" +
+                        //" LEFT JOIN vacancy_markers vm ON v.messageid = vm.vacancy_messageid" +
+                        //" LEFT JOIN vacancy_words vw ON v.messageid = vw.vacancy_messageid" +
                         " WHERE 1=1";
 
         if (periodFrom != null) hql += " AND v.date > :periodFrom";
         if (periodTo != null) hql += " AND v.date < :periodTo";
         hql += " AND v.currency = :currency";
-        if (markers.size() > 0) hql += " AND vm.markers IN (:markers)";
-        if (words.size() > 0) hql += " AND vw.words IN (:words)";
+        if (markers.size() > 0) {
+            if(SqlOperatorEnum.AND.equals(markersOperator)) hql += " AND messageid IN (SELECT vacancy_messageid FROM vacancy_markers WHERE markers IN (:markers) GROUP BY vacancy_messageid HAVING COUNT(markers)=:markersCount)";
+            else hql += " AND messageid IN (SELECT vacancy_messageid FROM vacancy_markers WHERE markers IN (:markers))";
+        }
+        if (words.size() > 0) {
+            if(SqlOperatorEnum.AND.equals(wordsOperator)) hql += " AND messageid IN (SELECT vacancy_messageid FROM vacancy_words WHERE words IN (:words) GROUP BY vacancy_messageid HAVING COUNT(words)=:wordsCount)";
+            else hql += " AND messageid IN (SELECT vacancy_messageid FROM vacancy_words WHERE words IN (:words))";
+        }
         if(!fromBorder) hql += " AND v.salaryTo is null";
         if(!toBorder) hql += " AND v.salaryFrom is null";
         if(!bothBorders) hql += " AND (v.salaryfrom is not null and v.salaryto is not null)";
@@ -80,8 +89,15 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom  {
         query.setParameter("currency", currency.toString());
         if (periodFrom != null) query.setParameter("periodFrom", periodFrom);
         if (periodTo != null) query.setParameter("periodTo", periodTo);
-        if (markers.size() > 0) query.setParameter("markers", markers);
-        if (words.size() > 0) query.setParameter("words", words);
+        if (markers.size() > 0) {
+            query.setParameter("markers", markers);
+            if(SqlOperatorEnum.AND.equals(markersOperator)) query.setParameter("markersCount", markers.size());
+
+        }
+        if (words.size() > 0) {
+            query.setParameter("words", words);
+            if(SqlOperatorEnum.AND.equals(wordsOperator)) query.setParameter("wordsCount", words.size());
+        }
         if(salaryFrom !=null)  query.setParameter("salaryFrom", salaryFrom);
         if(salaryTo !=null) query.setParameter("salaryTo", salaryTo);
 
@@ -97,8 +113,8 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom  {
     }
 
     public int getCurrencyRounder(CurrencyEnum currencyEnum) {
-        if(CurrencyEnum.RUB.equals(currencyEnum)) return -4;
-        else if(CurrencyEnum.USD.equals(currencyEnum)) return -3;
+        if(CurrencyEnum.RUB.equals(currencyEnum)) return -4; //round to 10000
+        else if(CurrencyEnum.USD.equals(currencyEnum)) return -2; //round to 100
         return -1; //should not be here
     }
 

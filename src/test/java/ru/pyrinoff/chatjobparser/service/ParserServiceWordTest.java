@@ -14,11 +14,10 @@ import static ru.pyrinoff.chatjobparser.service.ParserService.cleanupText;
 public final class ParserServiceWordTest extends AbstractSpringTest {
 
     @Autowired
-    private static @NotNull ParserService parserService;
+    private @NotNull ParserService parserService;
 
     @BeforeAll
     public static void setUp() {
-        parserService = context.getBean(ParserService.class);
         AbstractSalaryParser.DEBUG = true;
     }
 

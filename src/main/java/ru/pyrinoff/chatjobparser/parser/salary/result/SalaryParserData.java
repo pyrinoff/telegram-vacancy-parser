@@ -26,5 +26,17 @@ public class SalaryParserData {
 
     private @Nullable String currencyTo;
 
+    @Override public String toString() {
+        return "SalaryParserData{" +
+                "wordFrom='" + wordFrom + '\'' +
+                ", valueFrom='" + valueFrom + '\'' +
+                ", thousandFrom='" + thousandFrom + '\'' +
+                ", currencyFrom='" + currencyFrom + '\'' +
+                ", wordTo='" + wordTo + '\'' +
+                ", valueTo='" + valueTo + '\'' +
+                ", thousandTo='" + thousandTo + '\'' +
+                ", currencyTo='" + currencyTo + '\'' +
+                '}';
+    }
 
 }

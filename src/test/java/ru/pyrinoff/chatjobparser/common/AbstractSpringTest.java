@@ -5,19 +5,39 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import ru.pyrinoff.chatjobparser.ApplicationInitializer;
 import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
+import ru.pyrinoff.chatjobparser.configuration.WebMvcConfiguration;
+import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
+import ru.pyrinoff.chatjobparser.service.VacancyService;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
+//@TestPropertySource(properties = "spring.jpa.properties.hibernate.query.native=false")
+@ExtendWith(SpringExtension.class)
+@WebAppConfiguration
+@ContextConfiguration(classes = {ApplicationConfiguration.class, WebMvcConfiguration.class})
 public class AbstractSpringTest {
 
-    @NotNull
-    protected final static AnnotationConfigApplicationContext context =
-            new AnnotationConfigApplicationContext(ApplicationConfiguration.class);
+    @BeforeTestClass
+    public void setup() {
+    }
 
     @BeforeAll
     public static void setUp() {
-//        System.out.println("Spring Config initialized...");
     }
 
     @AfterAll

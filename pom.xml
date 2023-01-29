@@ -21,6 +21,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <outputDirectory>${project.build.directory}</outputDirectory>
         <spring.version>5.3.17</spring.version>
+        <filename>jobstat</filename>
     </properties>
 
     <dependencies>
@@ -99,12 +100,28 @@
         </dependency>
         <!-- DATABASE END -->
         <!-- UTIL -->
-        <dependency>
+        <!--<dependency>
+            &lt;!&ndash; test only, spring-orm conflict &ndash;&gt;
             <groupId>org.jsonschema2pojo</groupId>
             <artifactId>jsonschema2pojo-core</artifactId>
             <version>1.1.2</version>
-            <scope>test</scope> <!-- test only, spring-orm conflict -->
+            <scope>test</scope>
+        </dependency>-->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
         </dependency>
+      <!--  <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.14.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.14.1</version>
+        </dependency>-->
         <!-- UTIL END -->
         <!-- TEST -->
         <dependency>
@@ -125,11 +142,16 @@
             <version>2.4.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
         <!-- TEST END -->
     </dependencies>
 
     <build>
-        <finalName>chatjobparser</finalName>
+        <finalName>${filename}</finalName>
         <plugins>
            <!-- <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>

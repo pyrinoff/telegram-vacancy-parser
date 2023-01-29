@@ -13,6 +13,8 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import ru.pyrinoff.chatjobparser.service.PropertyService;
 
 import javax.sql.DataSource;
@@ -64,8 +66,16 @@ public class ApplicationConfiguration {
         properties.put(Environment.USE_MINIMAL_PUTS, propertyService.getCacheUseMinimalPuts());
         properties.put(Environment.CACHE_REGION_PREFIX, propertyService.getCacheRegionPrefix());
         properties.put(Environment.CACHE_PROVIDER_CONFIG, propertyService.getCacheProviderConfigurationFile());
+        properties.put("hibernate.query.native", propertyService.getDatabaseNativeQueriesEnabled());
         factoryBean.setJpaProperties(properties);
         return factoryBean;
+    }
+
+    @Bean
+    public MultipartResolver multipartResolver() {
+        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+        multipartResolver.setMaxUploadSize(propertyService.getUploadMaxSize()*1024*1024);
+        return multipartResolver;
     }
 
 }

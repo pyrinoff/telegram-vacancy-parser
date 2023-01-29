@@ -56,7 +56,13 @@ public class PropertyService {
     @Value("#{environment['database.admin_protection_token']}")
     private @NotNull String databaseAdminProtectionToken;
 
+    @Value("#{environment['database.native_queries_enabled']}")
+    private @NotNull Boolean databaseNativeQueriesEnabled;
+
     @Value("#{environment['liquibase.outputChangeLogFile']}")
     private @NotNull String liquibaseChangelogFile;
+
+    @Value("#{environment['upload.max_file_size_mb']}")
+    private @NotNull Integer uploadMaxSize;
 
 }

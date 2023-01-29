@@ -12,7 +12,9 @@ public enum TextTypeEnum {
     , MENTION("mention")
     , PLAIN("plain")
     , ITALIC("italic")
-    , UNDERLINE("underline");
+    , UNDERLINE("underline")
+    , PHONE("phone")
+    , EMAIL("email");
 
     private final String value;
 

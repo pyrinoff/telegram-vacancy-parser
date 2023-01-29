@@ -99,4 +99,6 @@ backup.yaml
 deploy/
 .allure/
 activemq-data/
-./*.json
+/*.json
+temp/
+.run/

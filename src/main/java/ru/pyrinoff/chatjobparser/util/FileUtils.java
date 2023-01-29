@@ -37,7 +37,7 @@ public interface FileUtils {
         return Files.readString(path);
     }
 
-    static @Nullable String getFilenameFromPath(@Nullable final String filepath) {
+     static @Nullable String getFilenameFromPath(@Nullable final String filepath) {
         if (filepath == null) return null;
         @NotNull final Path path = Path.of(filepath);
         return path.getFileName().toString();

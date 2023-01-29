@@ -2,16 +2,18 @@ package ru.pyrinoff.chatjobparser.service;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public final class PropertyServiceTest extends AbstractSpringTest {
 
-    private static @NotNull PropertyService PROPERTY_SERVICE;
+    @Autowired
+    private @NotNull PropertyService PROPERTY_SERVICE;
 
     @BeforeAll
     public static void setUp() {
-        PROPERTY_SERVICE = context.getBean(PropertyService.class);
+
     }
 
     @Test

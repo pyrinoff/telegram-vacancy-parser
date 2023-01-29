@@ -23,9 +23,15 @@ public class NumberUtilTest {
 
     @Test
     public void parseDouble() {
-        Assertions.assertEquals(1F, NumberUtil.parseFloat(" 1 года"));
-        Assertions.assertEquals(1.5F, NumberUtil.parseFloat(" 1.5 года"));
-        Assertions.assertEquals(1.5F, NumberUtil.parseFloat(" 1,5 года"));
+        Assertions.assertEquals(1F, NumberUtil.parseFloat(" 1 года", 3));
+        Assertions.assertEquals(1.5F, NumberUtil.parseFloat(" 1.5 года", 3));
+        Assertions.assertEquals(1.5F, NumberUtil.parseFloat(" 1,5 года", 3));
+    }
+
+    @Test
+    public void parseFloat() {
+        Assertions.assertEquals(3000F, NumberUtil.parseFloat("3000", 6));
+        Assertions.assertEquals(300F, NumberUtil.parseFloat("300.0000", 6));
     }
 
     @Test
