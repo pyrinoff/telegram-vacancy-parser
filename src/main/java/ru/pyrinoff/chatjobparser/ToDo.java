@@ -2,11 +2,10 @@ package ru.pyrinoff.chatjobparser;
 
 public class ToDo {
 
-    //TODO: CI/CD
-    //TODO: docker-compose + bash scripts
-    //TODO: hosting + domain
+    //TODO: дополнительные диаграммы
+    //TODO: ?? как обновлять? мб хранить текст вакансии внутри? при апйдейтах системы не нужно будет перезагружать файл,
+    //      просто перезапустить формирование? Но это гемор
+    //TODO: Автоапдейт из бота
 
-    //updates
-    //дополнительные диаграммы
 
 }

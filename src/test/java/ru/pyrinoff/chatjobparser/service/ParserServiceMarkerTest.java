@@ -37,49 +37,49 @@ public final class ParserServiceMarkerTest extends AbstractSpringTest {
     public void parseMarkerYear1() {
         @NotNull String text = " от 1 года ";
         @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().contains("year1.0"));
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("опыт_в_годах_1.0"));
     }
 
     @Test
     public void parseMarkerYear2() {
         @NotNull String text = " не менее 1,5 лет знание ";
         @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().contains("year1.5"));
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("опыт_в_годах_1.5"));
     }
 
     @Test
     public void parseMarkerYear4() {
         @NotNull String text = " к требования 2 года опыта в руч ";
         @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().contains("year2.0"));
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("опыт_в_годах_2.0"));
     }
 
     @Test
     public void parseMarkerYear5() {
         @NotNull String text = " и node js от года и больше! ";
         @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().contains("year1.0"));
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("опыт_в_годах_1.0"));
     }
 
     @Test
     public void parseMarkerYear6() {
         @NotNull String text = "от 3-х лет из них";
         @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().contains("year3.0"));
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("опыт_в_годах_3.0"));
     }
 
     @Test
     public void parseMarkerYear7() {
         @NotNull String text = "архитектуре от 3х лет;";
         @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().contains("year3.0"));
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("опыт_в_годах_3.0"));
     }
 
     @Test
     public void parseMarkerYear8() {
         @NotNull String text = "ировании от 2-3 лет •Знани";
         @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().contains("year2.0"));
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("опыт_в_годах_2.0"));
     }
 
     @Test
