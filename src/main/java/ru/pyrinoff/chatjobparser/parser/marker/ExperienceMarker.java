@@ -63,7 +63,7 @@ public class ExperienceMarker extends AbstractMarkerParser {
         numbers.add(patternTwoMaxValue(parserServiceResult.getText()));
         @NotNull final Float maxYearValue = NumberUtil.findMaxFloat(numbers);
         if (maxYearValue == null) return null;
-        return "year" + maxYearValue;
+        return "опыт_в_годах_" + maxYearValue;
     }
 
     public static boolean isLooksNormal(@NotNull final Float value) {

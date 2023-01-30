@@ -67,3 +67,11 @@ gross
 гросс
 на руки
 net
+нетто
+pytest
+testng
+jest
+nunit
+serenity
+kubernetes
+codeception
