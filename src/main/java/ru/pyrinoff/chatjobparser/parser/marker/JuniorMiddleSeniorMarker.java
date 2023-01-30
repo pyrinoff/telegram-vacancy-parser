@@ -9,10 +9,12 @@ import ru.pyrinoff.chatjobparser.util.TextUtil;
 import java.util.List;
 
 @Component
-public class SeniorMarker extends AbstractMarkerParser {
+public class JuniorMiddleSeniorMarker extends AbstractMarkerParser {
 
-    @Override public @Nullable String getMarker(@NotNull ParserServiceResult parserServiceResult) {
+    @Override public @Nullable String getMarker(@NotNull final ParserServiceResult parserServiceResult) {
         if(TextUtil.containsAny(parserServiceResult.getTextWords(), List.of("senior", "seniorqa", "qasenior", "сеньора", "сеньор"))) return "senior";
+        if(TextUtil.containsAny(parserServiceResult.getTextWords(), List.of("middle", "middleqa", "qamiddle", "middlesenior", "juniormiddle", "seniormiddle", "миддл", "мидл"))) return "middle";
+        if(TextUtil.containsAny(parserServiceResult.getTextWords(), List.of("junior", "джуниор"))) return "junior";
         return null;
     }
 
