@@ -2,9 +2,8 @@ package ru.pyrinoff.chatjobparser.model.endpoint;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
 
-import java.util.Date;
 import java.util.List;
 
 @Getter

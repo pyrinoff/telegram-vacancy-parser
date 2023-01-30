@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.context.annotation.PropertySource;
 import ru.pyrinoff.chatjobparser.exception.service.parser.ParsedTextEmpty;
 import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
 import ru.pyrinoff.chatjobparser.util.SimilarityUtil;
@@ -15,15 +14,13 @@ import java.util.Set;
 
 @Getter
 @Setter
-@PropertySource("classpath:/application.properties")
 public class ParserServiceResult extends Vacancy {
 
     private @Nullable String text;
 
     private @Nullable Set<String> textWords;
 
-    //@Value("#{environment['similarity_percent']}")
-    private static float SIMILARITY_PERCENT = 95.0F;
+    public static Float SIMILARITY_PERCENT = 95.0F;
 
     public @NotNull String getText() {
         if (text == null) throw new ParsedTextEmpty();

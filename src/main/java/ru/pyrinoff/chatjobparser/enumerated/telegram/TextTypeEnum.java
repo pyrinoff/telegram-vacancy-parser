@@ -1,5 +1,5 @@
 
-package ru.pyrinoff.chatjobparser.enumerated.model.telegram;
+package ru.pyrinoff.chatjobparser.enumerated.telegram;
 
 
 import org.jetbrains.annotations.Nullable;

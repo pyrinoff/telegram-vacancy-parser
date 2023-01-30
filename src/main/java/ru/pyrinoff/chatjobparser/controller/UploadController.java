@@ -1,6 +1,5 @@
 package ru.pyrinoff.chatjobparser.controller;
 
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +53,11 @@ public class UploadController {
                 parserService.parseVacancies(uploadedFile.getAbsolutePath(), null, true);
             }
             catch (@NotNull final Exception e) {
-                log.info(e.toString());
+                System.out.println(e.toString());
             }
             finally {
                 uploadedFile.delete();
             }
-
         }).start();
         modelAndView.addObject("message", "Файл загружен и поставлен на обработку: "+uploadedFile);
         return modelAndView;

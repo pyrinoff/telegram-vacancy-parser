@@ -1,14 +1,15 @@
 package ru.pyrinoff.chatjobparser.service;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.SqlOperatorEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.SqlOperatorEnum;
 import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
 import ru.pyrinoff.chatjobparser.model.endpoint.DatasetRequest;
 import ru.pyrinoff.chatjobparser.model.endpoint.DatasetResponse;
@@ -19,8 +20,8 @@ import ru.pyrinoff.chatjobparser.repository.VacancyRepository;
 import javax.annotation.PostConstruct;
 import java.util.*;
 
-@Slf4j
 @Service
+@Scope(BeanDefinition.SCOPE_SINGLETON)
 public class VacancyService {
 
     @Getter
@@ -41,7 +42,7 @@ public class VacancyService {
     }
 
     public void recalculateStatData() {
-        log.info("(Re)Calculating stat data...");
+        System.out.println("(Re)Calculating stat data...");
         DB_ROWS_COUNT = getRowsCount();
         DB_LAST_VACANCY_DATE = getLastVacancyDate();
         MARKERS = getMarkersList();
@@ -191,6 +192,10 @@ public class VacancyService {
 
     public void removeAll() {
         repository.deleteAll();
+    }
+
+    public void add(@NotNull final Vacancy vacancy) {
+        repository.save(vacancy);
     }
 
 }

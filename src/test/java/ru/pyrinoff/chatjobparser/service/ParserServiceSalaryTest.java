@@ -2,22 +2,12 @@ package ru.pyrinoff.chatjobparser.service;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
-import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
-import ru.pyrinoff.chatjobparser.configuration.WebMvcConfiguration;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
 import ru.pyrinoff.chatjobparser.exception.service.parser.VacancyNotCorrect;
-import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
-
-import java.util.Collections;
-import java.util.Date;
 
 import static ru.pyrinoff.chatjobparser.service.ParserService.cleanupText;
 

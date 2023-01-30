@@ -1,4 +1,4 @@
-package ru.pyrinoff.chatjobparser.endpoint;
+package ru.pyrinoff.chatjobparser.controller;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

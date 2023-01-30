@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
+import ru.pyrinoff.chatjobparser.service.MemoryUsageThreadService;
 import ru.pyrinoff.chatjobparser.service.ParserService;
+import ru.pyrinoff.chatjobparser.service.PropertyService;
 import ru.pyrinoff.chatjobparser.service.VacancyService;
 
-import java.util.HashMap;
+import javax.annotation.PostConstruct;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,6 +22,9 @@ public class IndexController {
 
     @Autowired
     VacancyService vacancyService;
+
+    @Autowired
+    PropertyService propertyService;
 
     private static final int LINES_COUNT = 3;
 

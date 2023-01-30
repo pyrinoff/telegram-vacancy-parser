@@ -1,7 +1,7 @@
 package ru.pyrinoff.chatjobparser.repository;
 
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.SqlOperatorEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.SqlOperatorEnum;
 
 import java.util.Date;
 import java.util.List;

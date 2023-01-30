@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.SqlOperatorEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.SqlOperatorEnum;
 
 import java.util.Date;
 import java.util.List;

@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Зарплаты в сфере QA | RU</title>
     <%--    <link href="./includes/bootstrap.min.css" rel="stylesheet">--%>
     <link href="./includes/index.css" rel="stylesheet">
     <%--    <script src="./includes/bootstrap.bundle.min.js"></script>--%>

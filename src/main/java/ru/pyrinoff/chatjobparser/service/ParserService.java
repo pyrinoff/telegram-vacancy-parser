@@ -2,21 +2,22 @@ package ru.pyrinoff.chatjobparser.service;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
-import ru.pyrinoff.chatjobparser.enumerated.model.telegram.TextTypeEnum;
+import ru.pyrinoff.chatjobparser.enumerated.telegram.TextTypeEnum;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageDateEmpty;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageTooSmall;
 import ru.pyrinoff.chatjobparser.exception.service.parser.ParsedTextEmpty;
 import ru.pyrinoff.chatjobparser.exception.service.parser.VacancyNotCorrect;
 import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
-import ru.pyrinoff.chatjobparser.model.telegram.*;
+import ru.pyrinoff.chatjobparser.model.telegram.ChatExportJson;
+import ru.pyrinoff.chatjobparser.model.telegram.Message;
+import ru.pyrinoff.chatjobparser.model.telegram.TextEntity;
 import ru.pyrinoff.chatjobparser.parser.marker.AbstractMarkerParser;
 import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
 import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
@@ -75,7 +76,7 @@ public class ParserService {
 
     @PostConstruct
     private void postLoad() {
-        if(AbstractSalaryParser.DEBUG) {
+        if (AbstractSalaryParser.DEBUG) {
             System.out.println("Parsers: ");
             salaryParserList.forEach(System.out::println);
             System.out.println("Parsers end");
@@ -148,25 +149,19 @@ public class ParserService {
             parseVacanciesFromTelegramHistory();
             makeVacanciesUnique();
             if (writeToDb) saveVacanciesToDb();
-        }
-        catch (@NotNull final Exception e) {
+        } catch (@NotNull final Exception e) {
             LAST_PROCESSING_RESULT = false;
             throw e;
-        }
-        finally {
-            PROCESSING_STATUS = false;
+        } finally {
+            parserServiceResultList.clear();
+            parserServiceResultSet.clear();
+            chatExportJson = null;
+            System.gc();
         }
         LAST_PROCESSING_RESULT = true;
-        vacancyService.recalculateStatData();
-        System.out.println("Stop parse vacancies");
-        cleanupMemory();
-    }
 
-    private void cleanupMemory() {
-        parserServiceResultList.clear();
-        parserServiceResultSet.clear();
-        chatExportJson = null;
-        System.gc();
+        vacancyService.recalculateStatData();
+        System.out.println("Vacancy parser stopped.");
     }
 
     @SneakyThrows
@@ -262,15 +257,23 @@ public class ParserService {
     private void saveVacanciesToDb() {
         System.out.println("Starting save to DB.");
         if (parserServiceResultSet == null || parserServiceResultSet.isEmpty()) return;
+
+        //Map to DTO
         @NotNull final List<Vacancy> vacancies = new ArrayList<>();
         for (@NotNull final ParserServiceResult oneResult : parserServiceResultSet) {
             @NotNull final Vacancy vacancy = mapResultToVacancy(oneResult);
-            if (vacancy != null) vacancies.add(vacancy);
+            if (vacancy != null) {
+                vacancies.add(vacancy);
+                //vacancyService.add(vacancy); //как оказалось, памяти жрет столько же, а выполняется чуть дольше
+            }
         }
-        System.out.println("Mapped parsed results to vacancy: "+vacancies.size());
+
+        parserServiceResultSet.clear(); //optimization
+
+        //Send to DB
+        System.out.println("Mapped parsed results to vacancy: " + vacancies.size());
         vacancyService.addAll(vacancies);
         System.out.println("Saved to DB.");
-        parserServiceResultSet.clear();
     }
 
 }

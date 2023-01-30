@@ -2,17 +2,9 @@ package ru.pyrinoff.chatjobparser.repository;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.support.JpaEntityInformation;
-import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.SqlOperatorEnum;
-import ru.pyrinoff.chatjobparser.model.dto.Vacancy;
+import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.SqlOperatorEnum;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

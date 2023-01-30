@@ -3,7 +3,7 @@ package ru.pyrinoff.chatjobparser.parser.salary;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import ru.pyrinoff.chatjobparser.enumerated.model.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
 import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserData;
 import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
 import ru.pyrinoff.chatjobparser.util.NumberUtil;

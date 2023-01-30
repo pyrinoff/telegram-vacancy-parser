@@ -1,4 +1,4 @@
-package ru.pyrinoff.chatjobparser.endpoint;
+package ru.pyrinoff.chatjobparser.controller;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -21,20 +21,6 @@ public class ParserEndpoint {
     @Autowired
     private @NotNull VacancyService vacancyService;
 
-    @GetMapping("/parseTest")
-    @ResponseBody
-    public ResponseEntity get() {
-        parserService.parseVacancies("d:/dev/java/Projects/JobParser/java_sources/jobstat/chatExportTest.json", null, true);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/parseTest2")
-    @ResponseBody
-    public ResponseEntity get2() {
-        parserService.parseVacancies("d:/dev/java/Projects/JobParser/java_sources/jobstat/chatExport.json", null, true);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/status")
     @ResponseBody
     public ParserStatusResponse get3() {
@@ -45,6 +31,7 @@ public class ParserEndpoint {
     @ResponseBody
     public ResponseEntity get4() {
         vacancyService.removeAll();
+        vacancyService.recalculateStatData();
         return ResponseEntity.ok().build();
     }
 

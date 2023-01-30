@@ -4,9 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
-import ru.pyrinoff.chatjobparser.service.ParserService;
 
 import java.util.ArrayList;
 import java.util.List;

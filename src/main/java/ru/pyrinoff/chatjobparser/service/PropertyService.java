@@ -2,9 +2,13 @@ package ru.pyrinoff.chatjobparser.service;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
+
+import javax.annotation.PostConstruct;
 
 @Getter
 @Service
@@ -64,5 +68,25 @@ public class PropertyService {
 
     @Value("#{environment['upload.max_file_size_mb']}")
     private @NotNull Integer uploadMaxSize;
+
+    @Value("#{environment['debug.memory']}")
+    private @NotNull Boolean debugMemory;
+
+    @Value("#{environment['similarity_percent']}")
+    private @Nullable Float similarityPercent;
+
+    @PostConstruct
+    void setStaticVariables() {
+        //думаю, это лучше, чем делать ParserServiceResult - бином (выше нагрузка), или же юзать кастомный Property-лоадер
+        if(similarityPercent!=null) ParserServiceResult.SIMILARITY_PERCENT = similarityPercent;
+    }
+
+    @PostConstruct
+    void runMemoryMonitor() {
+        if(debugMemory) {
+            @NotNull final Thread memoryUsageThread = new Thread(new MemoryUsageThreadService());
+            memoryUsageThread.start();
+        }
+    }
 
 }

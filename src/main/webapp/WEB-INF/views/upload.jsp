@@ -25,13 +25,17 @@
             </form>
         </div>
     </div>
-
     <div class="card border-none">
         <div class="card-body">
             <div class="alert-info"><c:out value="${message}"/></div>
             <div class="text-info" id="status-info"></div>
             <button class="btn btn-primary" onclick="checkStatus();">Проверить статус обработки</button>
             <button class="btn btn-primary" onclick="clearAll();">Удалить всё из базы</button>
+        </div>
+    </div>
+    <div class="card border-none">
+        <div class="card-body">
+            <a href="./">На главную</a>
         </div>
     </div>
 </div>

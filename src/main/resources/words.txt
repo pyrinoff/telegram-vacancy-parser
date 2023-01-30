@@ -50,7 +50,6 @@ python
 php
 c#
 cucumber
-net
 git
 postman
 mobile
@@ -64,3 +63,7 @@ redis
 node
 kanban
 gradle
+gross
+гросс
+на руки
+net

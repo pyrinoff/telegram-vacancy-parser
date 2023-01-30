@@ -7,8 +7,6 @@ import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
 
-import java.util.Collections;
-
 import static ru.pyrinoff.chatjobparser.service.ParserService.cleanupText;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)

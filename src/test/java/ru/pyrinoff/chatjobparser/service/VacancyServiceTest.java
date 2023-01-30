@@ -1,7 +1,6 @@
 package ru.pyrinoff.chatjobparser.service;
 
 import lombok.SneakyThrows;
-import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,7 +10,6 @@ import org.springframework.test.context.ContextConfiguration;
 import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
 import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
 import ru.pyrinoff.chatjobparser.configuration.WebMvcConfiguration;
-import ru.pyrinoff.chatjobparser.util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;

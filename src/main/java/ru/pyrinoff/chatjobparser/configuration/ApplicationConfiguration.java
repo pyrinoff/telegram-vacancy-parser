@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.hibernate.cfg.Environment;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -15,15 +16,22 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import ru.pyrinoff.chatjobparser.service.PropertyService;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@ComponentScan("ru.pyrinoff.chatjobparser")
+@ComponentScan(basePackages = "ru.pyrinoff.chatjobparser",
+        //excludeFilters={@ComponentScan.Filter(type= FilterType.ANNOTATION, value=EnableWebMvc.class)}
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "ru.pyrinoff.chatjobparser.controller.*")
+)
 @EnableTransactionManagement
-@EnableJpaRepositories({"ru.pyrinoff.chatjobparser.repository","ru.pyrinoff.chatjobparser.model"})
+@EnableJpaRepositories({
+        "ru.pyrinoff.chatjobparser.repository",
+        "ru.pyrinoff.chatjobparser.model"
+})
 public class ApplicationConfiguration {
 
     @Autowired
