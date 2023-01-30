@@ -157,6 +157,7 @@ public class ParserService {
             parserServiceResultSet.clear();
             chatExportJson = null;
             System.gc();
+            PROCESSING_STATUS = false;
         }
         LAST_PROCESSING_RESULT = true;
 

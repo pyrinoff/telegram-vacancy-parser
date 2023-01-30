@@ -25,7 +25,7 @@ services:
       database.url: jdbc:postgresql://postgres:5432/jp
       database.user: ${POSTGRES_USER}
       database.password: ${POSTGRES_PASSWORD}
-      CATALINA_OPTS: "-Xmx1024m"
+      CATALINA_OPTS: "-Xmx2048m"
     ports:
       - ${PORT_OUT_APP}:8080
     depends_on:
