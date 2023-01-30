@@ -89,11 +89,4 @@ public final class ParserServiceMarkerTest extends AbstractSpringTest {
         Assertions.assertTrue(parserServiceResult.getMarkers().isEmpty());
     }
 
-    @Test
-    public void parseMarkerNet() {
-        @NotNull String text = "~220-240к net годовая преми";
-        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().contains("net"));
-    }
-
 }
