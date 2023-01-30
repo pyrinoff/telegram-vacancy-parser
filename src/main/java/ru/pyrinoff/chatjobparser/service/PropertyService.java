@@ -70,7 +70,7 @@ public class PropertyService {
     private @NotNull Integer uploadMaxSize;
 
     @Value("#{environment['debug.memory']}")
-    private @NotNull Boolean debugMemory;
+    private @Nullable Boolean debugMemory;
 
     @Value("#{environment['similarity_percent']}")
     private @Nullable Float similarityPercent;
@@ -83,7 +83,7 @@ public class PropertyService {
 
     @PostConstruct
     void runMemoryMonitor() {
-        if(debugMemory) {
+        if(debugMemory!=null && debugMemory) {
             @NotNull final Thread memoryUsageThread = new Thread(new MemoryUsageThreadService());
             memoryUsageThread.start();
         }
