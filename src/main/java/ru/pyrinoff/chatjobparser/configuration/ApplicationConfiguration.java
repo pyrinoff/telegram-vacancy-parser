@@ -24,7 +24,6 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = "ru.pyrinoff.chatjobparser",
-        //excludeFilters={@ComponentScan.Filter(type= FilterType.ANNOTATION, value=EnableWebMvc.class)}
         excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "ru.pyrinoff.chatjobparser.controller.*")
 )
 @EnableTransactionManagement

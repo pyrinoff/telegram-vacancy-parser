@@ -183,7 +183,6 @@ public class VacancyService {
         return markers;
     }
 
-
     public @NotNull TreeSet<String> getWordsList() {
         TreeSet<String> words = repository.getWordsList();
         if(words == null) return new TreeSet<String>();

@@ -31,6 +31,8 @@
             <div class="text-info" id="status-info"></div>
             <button class="btn btn-primary" onclick="checkStatus();">Проверить статус обработки</button>
             <button class="btn btn-primary" onclick="clearAll();">Удалить всё из базы</button>
+            <button class="btn btn-primary" onclick="switchMaintenance(true);">Включить режим "Ведутся работы"</button>
+            <button class="btn btn-primary" onclick="switchMaintenance(false);">Выключить режим "Ведутся работы"</button>
         </div>
     </div>
     <div class="card border-none">

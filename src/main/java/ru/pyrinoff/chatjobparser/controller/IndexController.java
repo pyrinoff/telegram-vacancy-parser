@@ -5,12 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
-import ru.pyrinoff.chatjobparser.service.MemoryUsageThreadService;
 import ru.pyrinoff.chatjobparser.service.ParserService;
 import ru.pyrinoff.chatjobparser.service.PropertyService;
 import ru.pyrinoff.chatjobparser.service.VacancyService;
 
-import javax.annotation.PostConstruct;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -56,9 +54,15 @@ public class IndexController {
         put("december", "Декабрь");
     }};
 
+    public static boolean UNDER_MAINTENANCE = false;
+
     @GetMapping("/")
     public ModelAndView index() {
         @NotNull final ModelAndView modelAndView = new ModelAndView();
+        if (UNDER_MAINTENANCE) {
+            modelAndView.setViewName("maintenance");
+            return modelAndView;
+        }
         modelAndView.setViewName("index");
         modelAndView.addObject("LINES_COUNT", LINES_COUNT);
         modelAndView.addObject("DB_ROWS_COUNT", vacancyService.getDB_ROWS_COUNT());

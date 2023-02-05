@@ -8,7 +8,7 @@ import java.util.*;
 public interface TextUtil {
 
     static String getCleanupText(@NotNull final String text) {
-        return text.replaceAll("[^a-zа-я ]", "").replaceAll("\s{2,}+", " ");
+        return text.toLowerCase().replaceAll("[^a-zа-я ]", "").replaceAll("\s{2,}+", " ");
     }
 
     static Set<String> getSetOfWords(@NotNull final String text) {

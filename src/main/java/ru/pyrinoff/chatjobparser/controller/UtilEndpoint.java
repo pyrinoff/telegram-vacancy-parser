@@ -5,7 +5,7 @@ import ru.pyrinoff.chatjobparser.util.MemoryUsageUtil;
 
 @RestController
 @RequestMapping("/api")
-public class TestEndpoint {
+public class UtilEndpoint {
 
    @GetMapping("/info")
     private String info() {

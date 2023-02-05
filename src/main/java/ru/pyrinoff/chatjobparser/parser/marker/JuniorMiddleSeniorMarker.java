@@ -12,8 +12,8 @@ import java.util.List;
 public class JuniorMiddleSeniorMarker extends AbstractMarkerParser {
 
     @Override public @Nullable String getMarker(@NotNull final ParserServiceResult parserServiceResult) {
-        if(TextUtil.containsAny(parserServiceResult.getTextWords(), List.of("senior", "seniorqa", "qasenior", "сеньора", "сеньор"))) return "senior";
-        if(TextUtil.containsAny(parserServiceResult.getTextWords(), List.of("middle", "middleqa", "qamiddle", "middlesenior", "juniormiddle", "seniormiddle", "миддл", "мидл"))) return "middle";
+        if(TextUtil.containsAny(parserServiceResult.getTextWords(), List.of("senior", "seniorqa", "qasenior", "сеньора", "сеньор", "seniormiddle", "middlesenior"))) return "senior";
+        if(TextUtil.containsAny(parserServiceResult.getTextWords(), List.of("middle", "middleqa", "qamiddle", "juniormiddle",  "миддл", "мидл"))) return "middle";
         if(TextUtil.containsAny(parserServiceResult.getTextWords(), List.of("junior", "джуниор"))) return "junior";
         return null;
     }
