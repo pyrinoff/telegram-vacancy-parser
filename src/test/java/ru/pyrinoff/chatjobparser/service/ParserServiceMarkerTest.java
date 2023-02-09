@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
-import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
+import ru.pyrinoff.chatjobparser.component.parser.salary.AbstractSalaryParser;
 
 import static ru.pyrinoff.chatjobparser.service.ParserService.cleanupText;
 

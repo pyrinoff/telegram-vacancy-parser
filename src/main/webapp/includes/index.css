@@ -1,25 +1,11 @@
-.full-height {
-    height: 100vh;
+.salaryChart {
+    width: 100%;
+    /*height: 20%;*/
 }
 
-.flex-center {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-}
-
-.position-ref {
-    position: relative;
-}
-
-.top-right {
-    position: absolute;
-    right: 10px;
-    top: 18px;
-}
-
-.content {
-    text-align: center;
+.periodChart {
+    width: 100%;
+    /*height: 20%;*/
 }
 
 a {

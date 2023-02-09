@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
+import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
 import ru.pyrinoff.chatjobparser.enumerated.telegram.TextTypeEnum;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageDateEmpty;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageTooSmall;
@@ -18,12 +19,13 @@ import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.model.telegram.ChatExportJson;
 import ru.pyrinoff.chatjobparser.model.telegram.Message;
 import ru.pyrinoff.chatjobparser.model.telegram.TextEntity;
-import ru.pyrinoff.chatjobparser.parser.marker.AbstractMarkerParser;
-import ru.pyrinoff.chatjobparser.parser.salary.AbstractSalaryParser;
-import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
-import ru.pyrinoff.chatjobparser.parser.word.WordParser;
+import ru.pyrinoff.chatjobparser.component.parser.marker.AbstractMarkerParser;
+import ru.pyrinoff.chatjobparser.component.parser.salary.AbstractSalaryParser;
+import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserResult;
+import ru.pyrinoff.chatjobparser.component.parser.word.WordParser;
 import ru.pyrinoff.chatjobparser.util.FileUtils;
 import ru.pyrinoff.chatjobparser.util.JsonUtil;
+import ru.pyrinoff.chatjobparser.util.NumberUtil;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
@@ -37,11 +39,13 @@ public class ParserService {
 
     private static boolean SHOW_TEXT_DURING_PARSE = false;
 
-    @Nullable final Set<String> wordsToSearch;
+    @Nullable
+    final Set<String> wordsToSearch;
 
     private final int MIN_VACANCY_TEXT_LENGTH = 250;
 
-    private @NotNull final List<ParserServiceResult> parserServiceResultList = new ArrayList<>();
+    private @NotNull
+    final List<ParserServiceResult> parserServiceResultList = new ArrayList<>();
 
     private @NotNull Set<ParserServiceResult> parserServiceResultSet = new HashSet<>();
 
@@ -102,6 +106,21 @@ public class ParserService {
         parserServiceResult.setWords(wordsResultSet);
     }
 
+    public static int getCurrencyRounder(CurrencyEnum currencyEnum) {
+        if(CurrencyEnum.RUB.equals(currencyEnum)) return -4; //round to 10000
+        else if(CurrencyEnum.USD.equals(currencyEnum)) return -2; //round to 100
+        return -1; //should not be here
+    }
+
+    private static Integer getCalcSalary(@Nullable Integer from, @Nullable Integer to, @Nullable CurrencyEnum currencyEnum) {
+        Integer result = null;
+        if (from != null && to != null) result =  (from + to) / 2;
+        if (from != null) result =  from;
+        if (to != null) result =  to;
+        if(result == null) return null;
+        return (int) NumberUtil.round(result, getCurrencyRounder(currencyEnum));
+    }
+
     @SneakyThrows
     public void parseSalary(@NotNull final ParserServiceResult parserServiceResult) {
         @Nullable SalaryParserResult salaryParserResult = null;
@@ -117,8 +136,14 @@ public class ParserService {
 
         if (salaryParserResult == null) throw new VacancyNotCorrect("Cant parse salary!");
 
+        Integer salaryCalc = getCalcSalary(
+                salaryParserResult.getFrom()
+                , salaryParserResult.getTo()
+                , salaryParserResult.getCurrencyEnum()
+        );
         parserServiceResult.setSalaryFrom(salaryParserResult.getFrom());
         parserServiceResult.setSalaryTo(salaryParserResult.getTo());
+        parserServiceResult.setSalaryCalc(salaryCalc);
         parserServiceResult.setCurrency(salaryParserResult.getCurrencyEnum());
         parserServiceResult.setWithPrediction(salaryParserResult.getWithPrediction());
     }
@@ -247,6 +272,7 @@ public class ParserService {
         vacancy.setDate(parserServiceResult.getDate());
         vacancy.setSalaryFrom(parserServiceResult.getSalaryFrom());
         vacancy.setSalaryTo(parserServiceResult.getSalaryTo());
+        vacancy.setSalaryCalc(parserServiceResult.getSalaryCalc());
         vacancy.setCurrency(parserServiceResult.getCurrency());
         vacancy.setMarkers(parserServiceResult.getMarkers());
         vacancy.setWords(parserServiceResult.getWords());

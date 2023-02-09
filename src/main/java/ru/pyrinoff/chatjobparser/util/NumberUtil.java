@@ -16,8 +16,8 @@ public interface NumberUtil {
         @NotNull String partWithNumbers = floatOrIntegerString.replaceAll(",", ".");
         partWithNumbers = partWithNumbers.replaceAll(" ", "");
 
-        Map<Integer, List<String>> matches = RegexUtils.getMatches(partWithNumbers, "^[0-9.]{1,"+maxNumbersWithPointer+"}");
-        if (matches == null || matches.get(0)==null || matches.get(0).get(0)==null) return null;
+        Map<Integer, List<String>> matches = RegexUtils.getMatches(partWithNumbers, "^[0-9.]{1," + maxNumbersWithPointer + "}");
+        if (matches == null || matches.get(0) == null || matches.get(0).get(0) == null) return null;
         @NotNull String finalStringOfNumber = matches.get(0).get(0);
 
         try {
@@ -27,10 +27,9 @@ public interface NumberUtil {
         }
     }
 
-    static @Nullable Float findMaxFloat(@Nullable final List<Float> list)
-    {
+    static @Nullable Float findMaxFloat(@Nullable final List<Float> list) {
         @Nullable final List<Float> filteredList = list.stream().filter(oneFloat -> oneFloat != null).collect(Collectors.toList());
-        if (filteredList == null || filteredList.size() == 0)  return null;
+        if (filteredList == null || filteredList.size() == 0) return null;
         Collections.sort(filteredList);
         return filteredList.get(filteredList.size() - 1);
     }
@@ -38,6 +37,12 @@ public interface NumberUtil {
     static boolean isValueInRange(@Nullable final Integer value, @NotNull final Integer min, @NotNull final Integer max) {
         return value >= min && value <= max;
 
+    }
+
+    static double round(final double value, final int roundTo) {
+        double rounder = Math.pow(10, roundTo);
+        if(rounder > 0) return ( Math.round(value * rounder) / rounder );
+        return ( Math.round(value / rounder) * rounder );
     }
 
 }

@@ -1,4 +1,4 @@
-package ru.pyrinoff.chatjobparser.parser.word;
+package ru.pyrinoff.chatjobparser.component.parser.word;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

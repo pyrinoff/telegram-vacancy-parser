@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.enumerated.dto.TimePeriodEnum;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -36,6 +37,9 @@ public class Vacancy {
     protected @Nullable Integer salaryTo;
 
     @Column
+    protected @Nullable Integer salaryCalc;
+
+    @Column
     @Enumerated(EnumType.STRING)
     protected @Nullable CurrencyEnum currency;
 
@@ -53,5 +57,6 @@ public class Vacancy {
     @CollectionTable(name = "vacancy_words")
     @JoinColumn(foreignKey = @ForeignKey(name = "messageId"))
     protected @NotNull Set<String> words = new HashSet<>();
+
 
 }

@@ -1,11 +1,23 @@
-var globalChartData;
-var gChartOptions = {
+var gChartSalaryData;
+var gChartSalaryOptions = {
     title: 'График количества вакансий к зарплате',
     curveType: 'function',
     legend: {position: 'bottom'},
     //colors: ['red', 'blue', 'orange']
 };
-var gChartObject;
+var gSalaryCountChart;
+
+var gChartTimeData;
+var gChartPeriodOptions = {
+    title: 'Количество вакансий за промежуток времени',
+    //vAxis: {title: 'Количество'},
+    //hAxis: {title: 'Даты'},
+    seriesType: 'bars',
+    series: {5: {type: 'line'}},
+    legend: {position: 'bottom'}
+};
+var gTimePeriodChart;
+
 let gLinesCount;
 let gLinesEnabledState = [];
 const gDebugRequest = false;
@@ -24,30 +36,35 @@ function initializeLinesDefaults() {
     //setDate to current month
     for (i = 0; i < gLinesCount; i++) {
         setDateRange(gDefaultRange, i);
-        let element = document.querySelector('input.dateRange-'+i+'-'+gDefaultRange);
-        if(element!=null) element.checked = true;
+        let element = document.querySelector('input.dateRange-' + i + '-' + gDefaultRange);
+        if (element != null) element.checked = true;
     }
 }
 
-function redrawWithNewData(arrayData) {
-    globalChartData = google.visualization.arrayToDataTable(arrayData);
-    google.charts.setOnLoadCallback(drawChart);
+function redrawChartsWithNewData(response) {
+    gChartSalaryData = google.visualization.arrayToDataTable(response.salaryCountChart);
+    gChartTimeData = google.visualization.arrayToDataTable(response.dateCountChart);
+    google.charts.setOnLoadCallback(drawCharts);
 }
 
 
-function drawChart() {
-    view = new google.visualization.DataView(globalChartData);
+function drawCharts() {
+    let viewSalaryChart = new google.visualization.DataView(gChartSalaryData);
+    let viewTimeChart = new google.visualization.DataView(gChartTimeData);
 
     for (i = 0; i < gLinesCount; i++) {
-        if (gLinesEnabledState[i] === false) view.hideColumns([i + 1]);
+        if (gLinesEnabledState[i] === false) {
+            viewSalaryChart.hideColumns([i + 1]);
+            viewTimeChart.hideColumns([i + 1]);
+        }
     }
-    //if (optionalView == null) gChartObject.draw(globalChartData, gChartOptions);
-    gChartObject.draw(view, gChartOptions);
+    gSalaryCountChart.draw(viewSalaryChart, gChartSalaryOptions);
+    gTimePeriodChart.draw(viewTimeChart, gChartPeriodOptions);
 }
 
 function switchChartLineVisibility(index, toggleToState) {
     gLinesEnabledState[index] = toggleToState;
-    drawChart();
+    drawCharts();
 }
 
 function switchEnabledAlert(index, toggleToState) {
@@ -55,8 +72,6 @@ function switchEnabledAlert(index, toggleToState) {
     if (!toggleToState) element.classList.add('d-none');
     else element.classList.remove('d-none');
 }
-
-
 
 
 function addTextToInfo(someString) {
@@ -81,7 +96,7 @@ function sendRequestFunc() {
     }).then(response => response.json())
         .then(response => {
             // do something with the response
-            redrawWithNewData(response.dataset);
+            redrawChartsWithNewData(response);
             calculateLinesInfo(response);
             if (gDebugRequest) addTextToInfo(response);
         });
@@ -135,6 +150,7 @@ function getDataFromForm() {
     var formData = {};
     formData["lines"] = [];
     formData["salaryCurrency"] = extractAsString(document, 'input[name="salaryCurrency"]:checked'); //'input[name^="salaryCurrency"]:checked'
+    formData["timePeriod"] = extractAsString(document, 'input[name="timePeriod"]:checked');
 
     var fieldsets = document.querySelectorAll("fieldset");
     var fieldsetsCount = fieldsets.length;
@@ -151,9 +167,9 @@ function getDataFromForm() {
 
         var fieldsetData = {
             "markers": extractAsArray(oneFieldset, 'input[name="markers"]:checked'),
-            "markersOperator": extractAsString(document, 'input[name="markersOperator'+i+'"]:checked'),
+            "markersOperator": extractAsString(document, 'input[name="markersOperator' + i + '"]:checked'),
             "words": extractAsArray(oneFieldset, 'input[name="words"]:checked'),
-            "wordsOperator": extractAsString(document, 'input[name="wordsOperator'+i+'"]:checked'),
+            "wordsOperator": extractAsString(document, 'input[name="wordsOperator' + i + '"]:checked'),
             "salary": {
                 "fromBorder": hasSuchElements(oneFieldset, 'input[name="fromBorder"]:checked'),
                 "toBorder": hasSuchElements(oneFieldset, 'input[name="toBorder"]:checked'),
@@ -175,6 +191,10 @@ function getDataFromForm() {
 
 /* LOAD GOOGLE CHARTS ENGINE */
 function onReady() {
+    //page
+    recalculateInflation('one');
+
+    //chart
     google.charts.load('current', {'packages': ['corechart']});
     google.charts.setOnLoadCallback(onReady2);
 }
@@ -222,7 +242,8 @@ function setupToggleCards() {
 /* ALL OTHERS */
 function onReady2() {
     //make chart object
-    gChartObject = new google.visualization.LineChart(document.getElementById('curve_chart'));
+    gSalaryCountChart = new google.visualization.LineChart(document.getElementById('salaryChart'));
+    gTimePeriodChart = new google.visualization.ComboChart(document.getElementById('periodChart'));
 
     initializeLinesDefaults();
 
@@ -234,7 +255,6 @@ function onReady2() {
 
     //add listener for checkbox to switch lines off/on
     setupToggleLines();
-
     setupToggleCards();
 
 }
@@ -460,15 +480,14 @@ function checkStartDate(date, index) {
     if (date <= (new Date())) {
         element.textContent = '';
         element.classList.add('d-none');
-    }
-    else {
+    } else {
         element.textContent = 'Стартовая дата превышает текущую!'
         element.classList.remove('d-none');
     }
 }
 
 function calculateLinesInfo(response) {
-    var dataset = response.dataset;
+    var dataset = response.salaryCountChart;
     var currency = response.request.salaryCurrency;
 
     //Get initial data
@@ -479,40 +498,112 @@ function calculateLinesInfo(response) {
     var roundMultiplier = currency === 'RUB' ? 1000 : 100;
 
     //Foreach and collect data by line
-    for(i = 1; i<=linesCount; i++) {
+    for (i = 1; i <= linesCount; i++) {
         var maxSalary = null;
         var minSalary = null;
         var sum = 0;
         var vacancyCount = 0;
-        for(j = 1; j<rowCount; j++) {
+        for (j = 1; j < rowCount; j++) {
             var countOfVacanciesInRow = dataset[j][i];
-            if(countOfVacanciesInRow === 0) continue;
+            if (countOfVacanciesInRow === 0) continue;
             vacancyCount += countOfVacanciesInRow;
             var vacancySalary = dataset[j][0];
             sum += vacancySalary * countOfVacanciesInRow;
             maxSalary = vacancySalary > maxSalary ? vacancySalary : maxSalary;
             minSalary = vacancySalary < minSalary || minSalary == null ? vacancySalary : minSalary;
         }
-        if(sum === 0) continue; //null lines
-        var midSalary = Math.round(sum / vacancyCount / roundMultiplier)*roundMultiplier;
-        content+=
+        if (sum === 0) continue; //null lines
+        var midSalary = Math.round(sum / vacancyCount / roundMultiplier) * roundMultiplier;
+
+        //additional info
+        var dateFrom = response.request.lines[i - 1].periodFrom;
+        var dateTo = response.request.lines[i - 1].periodTo;
+        const dateDiff = monthsAndDaysBetweenRemain(dateFrom, dateTo);
+        content +=
             '<li>Линия '
-            +i
-            +':  вакансий всего - '
+            + i
+            + ' (' + dateFrom + ' - ' + dateTo
+            + (dateDiff.months > 0 ?  ', '+ dateDiff.months + ' мес.' : '')
+            + (dateDiff.days > 0 ?  ', '+ dateDiff.days + ' дн.' : '')
+            +')'
+            + ':  вакансий всего - '
             + vacancyCount
-            +' шт, средняя ЗП - '
+            + ' шт, средняя ЗП - '
             + midSalary
             + ', минимальная - '
             + minSalary
             + ', максимальная - '
             + maxSalary
-            +'</li>';
+            + '</li>';
     }
-    content +='</ul>'
+    content += '</ul>'
 
     //Show line
     var element = document.querySelector('#linesInfo');
     element.innerHTML = content;
+
+}
+
+function daysAndMonthsBetweenFull(date1, date2) {
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    const diffTime = Math.abs(d2 - d1);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const months = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+
+    return {
+        days: diffDays,
+        months: months
+    };
+}
+
+function monthsAndDaysBetweenRemain(date1, date2) {
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    const diffTime = Math.abs(d2 - d1);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const months = Math.floor((d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()));
+    const remainingDays = diffDays - months * 30;
+
+    return {
+        months: months,
+        days: remainingDays
+    };
+}
+
+var inflationRates = {
+    2022: 11.92,
+    2021: 4.91,
+    2020: 8.39
+}
+
+function recalculateInflation(border) {
+    const fromBorder = border === 'one';
+
+    let yearOne = document.getElementById('inflationYearOne').value;
+    let yearTwo = document.getElementById('inflationYearTwo').value;
+
+    let inflationFieldOne = document.getElementById('inflationSalaryOne');
+    let inflationFieldTwo = document.getElementById('inflationSalaryTwo');
+
+    let inflationValueOne = inflationFieldOne.value;
+    let inflationValueTwo = inflationFieldTwo.value;
+
+    let coefficient = 1;
+
+    if(yearOne <= 2020) coefficient = coefficient * (1 + inflationRates["2020"] / 100);
+    if(yearOne <= 2021) coefficient = coefficient * (1 + inflationRates["2021"] / 100);
+    if(yearOne <= 2022) coefficient = coefficient * (1 + inflationRates["2022"] / 100);
+
+    if(fromBorder) {
+        inflationFieldTwo.value = Math.round(inflationValueOne * coefficient);
+        console.log("Will set inflationFieldTwo to: ", inflationValueTwo);
+    }
+    else {
+        inflationFieldOne.value = Math.round(inflationValueTwo / (1+coefficient/100));
+        console.log("Will set inflationFieldOne to: ", inflationFieldOne);
+    }
+
 
 }
 

@@ -9,6 +9,8 @@ public class DatasetResponse {
 
     private DatasetRequest request;
 
-    private Object[][] dataset;
+    private Object[][] salaryCountChart;
+
+    private Object[][] dateCountChart;
 
 }

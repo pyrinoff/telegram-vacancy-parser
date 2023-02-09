@@ -42,4 +42,13 @@ public class NumberUtilTest {
         Assertions.assertEquals(3F, NumberUtil.findMaxFloat(floatList));
     }
 
+    @Test
+    public void round() {
+        Assertions.assertEquals(10000, NumberUtil.round(10300, -4));
+        Assertions.assertEquals(20000, NumberUtil.round(15500, -4));
+        Assertions.assertEquals(10.50, NumberUtil.round(10.502, 2));
+        Assertions.assertEquals(10.6, NumberUtil.round(10.55, 1));
+        Assertions.assertEquals(10.5, NumberUtil.round(10.54, 1));
+    }
+
 }

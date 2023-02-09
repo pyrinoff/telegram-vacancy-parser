@@ -29,8 +29,12 @@
         <div class="card-body">
             <div class="alert-info"><c:out value="${message}"/></div>
             <div class="text-info" id="status-info"></div>
+        </div>
+        <div class="card-body">
             <button class="btn btn-primary" onclick="checkStatus();">Проверить статус обработки</button>
             <button class="btn btn-primary" onclick="clearAll();">Удалить всё из базы</button>
+        </div>
+        <div class="card-body">
             <button class="btn btn-primary" onclick="switchMaintenance(true);">Включить режим "Ведутся работы"</button>
             <button class="btn btn-primary" onclick="switchMaintenance(false);">Выключить режим "Ведутся работы"</button>
         </div>

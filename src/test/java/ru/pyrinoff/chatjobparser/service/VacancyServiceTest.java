@@ -10,6 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
 import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
 import ru.pyrinoff.chatjobparser.configuration.WebMvcConfiguration;
+import ru.pyrinoff.chatjobparser.service.charts.SalaryCountChartService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class VacancyServiceTest extends AbstractSpringTest {
                     put(90000, 2);
                 }}
         );
-        Object[][] actualObject = VacancyService.convertListMapResultArray(resultLinesList);
+        Object[][] actualObject = SalaryCountChartService.convertListMapResultArray(resultLinesList);
         Object[][] expectedObject = new Object[][]{
                 {"Зарплата", "Линия 1", "Линия 2"},
                 {50000, 1, 0},

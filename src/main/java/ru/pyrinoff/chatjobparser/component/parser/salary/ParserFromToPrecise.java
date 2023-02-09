@@ -1,12 +1,12 @@
-package ru.pyrinoff.chatjobparser.parser.salary;
+package ru.pyrinoff.chatjobparser.component.parser.salary;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserData;
-import ru.pyrinoff.chatjobparser.parser.salary.result.SalaryParserResult;
+import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserData;
+import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserResult;
 
 import java.util.List;
 

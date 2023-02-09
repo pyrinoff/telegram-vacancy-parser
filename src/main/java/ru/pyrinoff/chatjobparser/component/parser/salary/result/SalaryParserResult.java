@@ -1,4 +1,4 @@
-package ru.pyrinoff.chatjobparser.parser.salary.result;
+package ru.pyrinoff.chatjobparser.component.parser.salary.result;
 
 import lombok.Getter;
 import lombok.Setter;
