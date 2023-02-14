@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import ru.pyrinoff.chatjobparser.component.parser.salary.AbstractSalaryParser;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 
 import javax.annotation.PostConstruct;
@@ -75,10 +76,43 @@ public class PropertyService {
     @Value("#{environment['similarity_percent']}")
     private @Nullable Float similarityPercent;
 
+    //SALARY BORDERS
+    @Value("#{environment['salary.borders.precise.rub.min']}")
+    private @Nullable Integer salaryBordersPreciseRubMin;
+
+    @Value("#{environment['salary.borders.precise.rub.max']}")
+    private @Nullable Integer salaryBordersPreciseRubMax;
+
+    @Value("#{environment['salary.borders.nonprecise.rub.min']}")
+    private @Nullable Integer salaryBordersNonPreciseRubMin;
+
+    @Value("#{environment['salary.borders.nonprecise.rub.max']}")
+    private @Nullable Integer salaryBordersNonPreciseRubMax;
+
+    @Value("#{environment['salary.borders.precise.usd.min']}")
+    private @Nullable Integer salaryBordersPreciseUsdMin;
+
+    @Value("#{environment['salary.borders.precise.usd.max']}")
+    private @Nullable Integer salaryBordersPreciseUsdMax;
+
+    @Value("#{environment['salary.borders.nonprecise.usd.min']}")
+    private @Nullable Integer salaryBordersNonPreciseUsdMin;
+
+    @Value("#{environment['salary.borders.nonprecise.usd.max']}")
+    private @Nullable Integer salaryBordersNonPreciseUsdMax;
+
     @PostConstruct
     void setStaticVariables() {
         //думаю, это лучше, чем делать ParserServiceResult - бином (выше нагрузка), или же юзать кастомный Property-лоадер
         if(similarityPercent!=null) ParserServiceResult.SIMILARITY_PERCENT = similarityPercent;
+        if(salaryBordersPreciseRubMin!=null) AbstractSalaryParser.BORDER_PRECISE_RUB_MIN = salaryBordersPreciseRubMin;
+        if(salaryBordersPreciseRubMax!=null) AbstractSalaryParser.BORDER_PRECISE_RUB_MAX = salaryBordersPreciseRubMax;
+        if(salaryBordersNonPreciseRubMin!=null) AbstractSalaryParser.BORDER_NON_PRECISE_RUB_MIN = salaryBordersNonPreciseRubMin;
+        if(salaryBordersNonPreciseRubMax!=null) AbstractSalaryParser.BORDER_NON_PRECISE_RUB_MAX = salaryBordersNonPreciseRubMax;
+        if(salaryBordersPreciseUsdMin!=null) AbstractSalaryParser.BORDER_PRECISE_USD_MIN = salaryBordersPreciseUsdMin;
+        if(salaryBordersPreciseUsdMax!=null) AbstractSalaryParser.BORDER_PRECISE_USD_MAX = salaryBordersPreciseUsdMax;
+        if(salaryBordersNonPreciseUsdMin!=null) AbstractSalaryParser.BORDER_NON_PRECISE_USD_MIN = salaryBordersNonPreciseUsdMin;
+        if(salaryBordersNonPreciseUsdMax!=null) AbstractSalaryParser.BORDER_NON_PRECISE_USD_MAX = salaryBordersNonPreciseUsdMax;
     }
 
     @PostConstruct

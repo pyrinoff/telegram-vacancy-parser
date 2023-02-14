@@ -75,3 +75,7 @@ nunit
 serenity
 kubernetes
 codeception
+лид
+lead
+manual
+ручное

@@ -86,7 +86,76 @@ public final class ParserServiceMarkerTest extends AbstractSpringTest {
     public void parseMarkerYear9() {
         @NotNull String text = "от 11 лет";
         @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
-        Assertions.assertTrue(parserServiceResult.getMarkers().isEmpty());
+        for(@NotNull final String oneMarker : parserServiceResult.getMarkers()) {
+            Assertions.assertFalse(oneMarker.contains("опыт_в_годах"));
+        }
+
     }
+
+    @Test
+    public void parseMarkerAuto1() {
+        @NotNull String text = "ручное и автоматизированное тестирование";
+        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
+        Assertions.assertEquals(parserServiceResult.getMarkers().size(), 1);
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("авто_и_ручное"));
+    }
+
+    @Test
+    public void parseMarkerAuto2() {
+        @NotNull String text = "manual & autotesting";
+        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
+        Assertions.assertEquals(parserServiceResult.getMarkers().size(), 1);
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("авто_и_ручное"));
+    }
+
+    @Test
+    public void parseMarkerAuto3() {
+        @NotNull String text = "ручное тестирование";
+        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
+        Assertions.assertEquals(parserServiceResult.getMarkers().size(), 1);
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("ручное_only"));
+    }
+
+    @Test
+    public void parseMarkerAuto4() {
+        @NotNull String text = "manual testing";
+        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
+        Assertions.assertEquals(parserServiceResult.getMarkers().size(), 1);
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("ручное_only"));
+    }
+
+    @Test
+    public void parseMarkerAuto5() {
+        @NotNull String text = "автоматизированное тестирование";
+        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
+        Assertions.assertEquals(parserServiceResult.getMarkers().size(), 1);
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("авто_only"));
+    }
+
+
+    @Test
+    public void parseMarkerAuto6() {
+        @NotNull String text = "auto testing";
+        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
+        Assertions.assertEquals(parserServiceResult.getMarkers().size(), 1);
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("авто_only"));
+    }
+
+    @Test
+    public void parseMarkerAuto7() {
+        @NotNull String text = "нагрузочное тестирование и мануальное и автоматизированное";
+        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
+        Assertions.assertEquals(parserServiceResult.getMarkers().size(), 1);
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("нагрузочное"));
+    }
+
+    @Test
+    public void parseMarkerAuto8() {
+        @NotNull String text = "от 11 лет";
+        @NotNull final ParserServiceResult parserServiceResult = parseMarkersToResult(text);
+        Assertions.assertEquals(parserServiceResult.getMarkers().size(), 1);
+        Assertions.assertTrue(parserServiceResult.getMarkers().contains("ручное_или_не_указано"));
+    }
+
 
 }

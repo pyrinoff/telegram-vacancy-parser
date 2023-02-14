@@ -2,10 +2,12 @@ package ru.pyrinoff.chatjobparser.component.parser.salary;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserData;
 import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserResult;
 import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
+import ru.pyrinoff.chatjobparser.service.PropertyService;
 import ru.pyrinoff.chatjobparser.util.NumberUtil;
 import ru.pyrinoff.chatjobparser.util.RegexUtils;
 
@@ -29,6 +31,17 @@ public abstract class AbstractSalaryParser {
     public static final @NotNull String TO_PATTERN = "(до|-|–| |—|-)";
 
     public static boolean DEBUG = false;
+
+
+    public static @NotNull Integer BORDER_PRECISE_RUB_MIN = 15000;
+    public static @NotNull Integer BORDER_PRECISE_RUB_MAX = 800000;
+    public static @NotNull Integer BORDER_NON_PRECISE_RUB_MIN = 15000;
+    public static @NotNull Integer BORDER_NON_PRECISE_RUB_MAX = 450000;
+
+    public static @NotNull Integer BORDER_PRECISE_USD_MIN = 300;
+    public static @NotNull Integer BORDER_PRECISE_USD_MAX = 12000;
+    public static @NotNull Integer BORDER_NON_PRECISE_USD_MIN = 1000;
+    public static @NotNull Integer BORDER_NON_PRECISE_USD_MAX = 7000;
 
     protected static @Nullable CurrencyEnum getCurrencyByString(@Nullable final String currencyString) {
         if (currencyString == null || currencyString.isEmpty()) return null;
@@ -57,11 +70,11 @@ public abstract class AbstractSalaryParser {
             boolean smallRange) {
         if(DEBUG) System.out.println("Check salary for range, currency "+currency+", value: "+value+", small range: "+smallRange);
         if (smallRange) {
-            if (currency == CurrencyEnum.RUB && isValueInRange(value, 15000, 450000)) return true;
-            if (currency == CurrencyEnum.USD && isValueInRange(value, 1000, 7000)) return true;
+            if (currency == CurrencyEnum.RUB && isValueInRange(value, BORDER_NON_PRECISE_RUB_MIN, BORDER_NON_PRECISE_RUB_MAX)) return true;
+            if (currency == CurrencyEnum.USD && isValueInRange(value, BORDER_NON_PRECISE_USD_MIN, BORDER_NON_PRECISE_USD_MAX)) return true;
         } else {
-            if (currency == CurrencyEnum.RUB && isValueInRange(value, 15000, 800000)) return true;
-            if (currency == CurrencyEnum.USD && isValueInRange(value, 300, 12000)) return true;
+            if (currency == CurrencyEnum.RUB && isValueInRange(value, BORDER_PRECISE_RUB_MIN, BORDER_PRECISE_RUB_MAX)) return true;
+            if (currency == CurrencyEnum.USD && isValueInRange(value, BORDER_PRECISE_USD_MIN, BORDER_PRECISE_USD_MAX)) return true;
         }
         if (DEBUG) System.out.println("Salary looks like NOT normal!");
         return false;

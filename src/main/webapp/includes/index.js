@@ -503,6 +503,10 @@ function calculateLinesInfo(response) {
         var minSalary = null;
         var sum = 0;
         var vacancyCount = 0;
+        var dateFrom = null;
+        var dateTo = null;
+        var midSalary = 0;
+
         for (j = 1; j < rowCount; j++) {
             var countOfVacanciesInRow = dataset[j][i];
             if (countOfVacanciesInRow === 0) continue;
@@ -513,11 +517,11 @@ function calculateLinesInfo(response) {
             minSalary = vacancySalary < minSalary || minSalary == null ? vacancySalary : minSalary;
         }
         if (sum === 0) continue; //null lines
-        var midSalary = Math.round(sum / vacancyCount / roundMultiplier) * roundMultiplier;
+        midSalary = Math.round(sum / vacancyCount / roundMultiplier) * roundMultiplier;
 
         //additional info
-        var dateFrom = response.request.lines[i - 1].periodFrom;
-        var dateTo = response.request.lines[i - 1].periodTo;
+        dateFrom = response.request.lines[i - 1].periodFrom;
+        dateTo = response.request.lines[i - 1].periodTo;
         const dateDiff = monthsAndDaysBetweenRemain(dateFrom, dateTo);
         content +=
             '<li>Линия '
