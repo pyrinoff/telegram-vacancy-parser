@@ -101,6 +101,12 @@ public class PropertyService {
     @Value("#{environment['salary.borders.nonprecise.usd.max']}")
     private @Nullable Integer salaryBordersNonPreciseUsdMax;
 
+    @Value("#{environment['user.login']}")
+    private @NotNull String userLogin;
+
+    @Value("#{environment['user.password']}")
+    private @NotNull String userPassword;
+
     @PostConstruct
     void setStaticVariables() {
         //думаю, это лучше, чем делать ParserServiceResult - бином (выше нагрузка), или же юзать кастомный Property-лоадер
