@@ -88,6 +88,7 @@ public class WebMvcConfiguration extends WebSecurityConfigurerAdapter implements
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
+                .antMatchers("/api/dataset").permitAll()
                 .antMatchers("/includes/*").permitAll()
                 //.antMatchers("/upload").hasAnyRole("USER")
                 //.and().formLogin()
