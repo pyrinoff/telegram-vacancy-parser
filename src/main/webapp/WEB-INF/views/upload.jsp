@@ -15,11 +15,11 @@
             <form method="POST" action="./upload" enctype="multipart/form-data">
                 <table>
                     <tr>
-                        <td><label for="file">Файл:</label></td>
+                        <td><label for="file">Загрузка JSON-файла:</label></td>
                         <td><input type="file" name="file" id="file"/></td>
                     </tr>
                     <tr>
-                        <td><input type="submit" value="Submit"/></td>
+                        <td><input type="submit" value="Отправить в обработку"/></td>
                     </tr>
                 </table>
             </form>

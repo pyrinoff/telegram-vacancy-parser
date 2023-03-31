@@ -102,5 +102,4 @@ activemq-data/
 /*.json
 temp/
 .run/
-/upload/files/opt/docker/.env
 *.tar.gz
