@@ -23,13 +23,13 @@ public class ParserEndpoint {
 
     @GetMapping("/status")
     @ResponseBody
-    public ParserStatusResponse get3() {
-        return new ParserStatusResponse(parserService.isPROCESSING_STATUS(), parserService.getLAST_PROCESSING_RESULT());
+    public ParserStatusResponse getStatus() {
+        return new ParserStatusResponse(parserService.isProcessingStatus(), parserService.getLastProcessingResult());
     }
 
     @GetMapping("/clearAll")
     @ResponseBody
-    public ResponseEntity get4() {
+    public ResponseEntity clearAll() {
         vacancyService.removeAll();
         vacancyService.recalculateStatData();
         return ResponseEntity.ok().build();

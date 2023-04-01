@@ -1,7 +1,7 @@
 function checkStatus() {
     setInfoText('Запустили проверку статуса...');
     fetch('./api/parse/status', {
-        method: 'GET',
+        method: 'GET'
         //headers: {'Content-Type': 'application/json'},
         //body: JSON.stringify(requestData)
     }).then(response => response.json())
@@ -9,7 +9,7 @@ function checkStatus() {
             if (typeof response !== 'object' || response === null || response.processing === null) responseString = 'Запрос вернул неожиданный ответ: ' + response;
             else {
                 responseString = 'Статус: обработка ' + (response.processing ? 'в процессе' : 'завершена/не идет');
-                if (!response.processing) responseString += ', результат обработки: ' + (response.result ? 'успешен' : response.result === false ? 'не успешен' : 'не производился');
+                if (!response.processing) responseString += ', результат последней обработки: ' + response.result;
             }
             setInfoText(responseString);
         });

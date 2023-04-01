@@ -26,41 +26,24 @@ public class UploadController {
     public ModelAndView uploadPage() {
         @NotNull final ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("upload");
-        //modelAndView.addObject("WORDS", WORDS);
         return modelAndView;
     }
 
     @PostMapping("/upload")
     public ModelAndView uploadProcessing(@RequestParam("file") MultipartFile file) {
         @NotNull final ModelAndView modelAndView = new ModelAndView();
-        if (file.isEmpty()) {
-            modelAndView.setViewName("upload");
-            modelAndView.addObject("message", "Файл пуст!");
-            return modelAndView;
-        }
+        modelAndView.setViewName("upload");
 
-        File tempDir = new File(System.getProperty("java.io.tmpdir"));
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        File uploadedFile = new File(tempDir, fileName);
+        //Основная бизнес-логика
         try {
-            file.transferTo(uploadedFile);
-        } catch (IOException e) {
-            modelAndView.addObject("message", "Ошибка при загрузке файла: " + e);
+            parserService.startProcessingThread(file);
+            modelAndView.addObject("message", "Файл загружен и поставлен на обработку!");
             return modelAndView;
         }
-        new Thread(() -> {
-            try {
-                parserService.parseVacancies(uploadedFile.getAbsolutePath(), null, true);
-            }
-            catch (@NotNull final Exception e) {
-                System.out.println(e.toString());
-            }
-            finally {
-                uploadedFile.delete();
-            }
-        }).start();
-        modelAndView.addObject("message", "Файл загружен и поставлен на обработку: "+uploadedFile);
-        return modelAndView;
+        catch (final Exception e) {
+            modelAndView.addObject("message", "Ошибка: " + e.getMessage());
+            return modelAndView;
+        }
     }
 
 }

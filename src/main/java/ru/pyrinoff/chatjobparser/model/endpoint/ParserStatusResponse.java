@@ -7,9 +7,9 @@ public class ParserStatusResponse {
 
     private Boolean processing;
 
-    private Boolean result;
+    private String result;
 
-    public ParserStatusResponse(Boolean processing, Boolean result) {
+    public ParserStatusResponse(Boolean processing, String result) {
         this.processing = processing;
         this.result = result;
     }

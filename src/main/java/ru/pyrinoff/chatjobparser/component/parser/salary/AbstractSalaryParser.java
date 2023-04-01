@@ -3,6 +3,7 @@ package ru.pyrinoff.chatjobparser.component.parser.salary;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserData;
 import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserResult;
@@ -18,6 +19,7 @@ import java.util.Map;
 import static ru.pyrinoff.chatjobparser.util.NumberUtil.isValueInRange;
 
 @Component
+@PropertySource("classpath:/application.properties")
 public abstract class AbstractSalaryParser {
 
     public static final @NotNull String CAN_BE_WHITESPACE = "[\\s]{0,1}";
@@ -32,12 +34,10 @@ public abstract class AbstractSalaryParser {
 
     public static boolean DEBUG = false;
 
-
     public static @NotNull Integer BORDER_PRECISE_RUB_MIN = 15000;
     public static @NotNull Integer BORDER_PRECISE_RUB_MAX = 800000;
     public static @NotNull Integer BORDER_NON_PRECISE_RUB_MIN = 15000;
     public static @NotNull Integer BORDER_NON_PRECISE_RUB_MAX = 450000;
-
     public static @NotNull Integer BORDER_PRECISE_USD_MIN = 300;
     public static @NotNull Integer BORDER_PRECISE_USD_MAX = 12000;
     public static @NotNull Integer BORDER_NON_PRECISE_USD_MIN = 1000;

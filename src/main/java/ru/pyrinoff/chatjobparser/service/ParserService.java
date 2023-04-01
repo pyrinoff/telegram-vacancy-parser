@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
 import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
 import ru.pyrinoff.chatjobparser.enumerated.telegram.TextTypeEnum;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageDateEmpty;
@@ -28,6 +29,8 @@ import ru.pyrinoff.chatjobparser.util.JsonUtil;
 import ru.pyrinoff.chatjobparser.util.NumberUtil;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,15 +40,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ParserService {
 
-    private static boolean SHOW_TEXT_DURING_PARSE = false;
-
     @Nullable
     final Set<String> wordsToSearch;
 
     private final int MIN_VACANCY_TEXT_LENGTH = 250;
 
-    private @NotNull
-    final List<ParserServiceResult> parserServiceResultList = new ArrayList<>();
+    private @NotNull final List<ParserServiceResult> parserServiceResultList = new ArrayList<>();
 
     private @NotNull Set<ParserServiceResult> parserServiceResultSet = new HashSet<>();
 
@@ -60,9 +60,11 @@ public class ParserService {
 
     private @Nullable ChatExportJson chatExportJson;
 
-    private boolean PROCESSING_STATUS = false;
+    private boolean processingStatus = false;
 
-    private Boolean LAST_PROCESSING_RESULT = null;
+    private String lastProcessingResult = "файл еще не загружался";
+
+    private Thread processingThread = null;
 
     @SneakyThrows
     public ParserService() {
@@ -166,8 +168,8 @@ public class ParserService {
     @SneakyThrows
     public void parseVacancies(@NotNull String filepath, @Nullable Integer filterById, final boolean writeToDb) {
         System.out.println("Starting parse vacancies");
-        PROCESSING_STATUS = true;
-        LAST_PROCESSING_RESULT = null;
+        processingStatus = true;
+        lastProcessingResult = null;
         try {
             parseFileToMemory(filepath);
             if (filterById != null) filterById(filterById);
@@ -175,17 +177,16 @@ public class ParserService {
             makeVacanciesUnique();
             if (writeToDb) saveVacanciesToDb();
         } catch (@NotNull final Exception e) {
-            LAST_PROCESSING_RESULT = false;
+            lastProcessingResult = "ERROR: " + e.getMessage();
             throw e;
         } finally {
             parserServiceResultList.clear();
             parserServiceResultSet.clear();
             chatExportJson = null;
             System.gc();
-            PROCESSING_STATUS = false;
+            processingStatus = false;
         }
-        LAST_PROCESSING_RESULT = true;
-
+        lastProcessingResult = "успешно";
         vacancyService.recalculateStatData();
         System.out.println("Vacancy parser stopped.");
     }
@@ -294,13 +295,38 @@ public class ParserService {
                 //vacancyService.add(vacancy); //как оказалось, памяти жрет столько же, а выполняется чуть дольше
             }
         }
-
         parserServiceResultSet.clear(); //optimization
 
         //Send to DB
         System.out.println("Mapped parsed results to vacancy: " + vacancies.size());
         vacancyService.addAll(vacancies);
         System.out.println("Saved to DB.");
+    }
+
+    public void startProcessingThread(@NotNull final MultipartFile uploadedFile) throws Exception {
+        if(processingThread != null && processingThread.isAlive()) throw new Exception("Обработка уже идет, дождитесь её окончания!");
+
+        //Подготовка файла к обработке
+        if (uploadedFile.isEmpty()) throw  new Exception("Файл пуст!");
+        File tempDir = new File(System.getProperty("java.io.tmpdir"));
+        String fileName = UUID.randomUUID() + "_" + uploadedFile.getOriginalFilename();
+        File temporaryFile = new File(tempDir, fileName);
+        try {
+            uploadedFile.transferTo(temporaryFile);
+        } catch (final IOException e) {
+            throw new Exception("Ошибка при загрузке файла: " + e);
+        }
+
+        //Тред обработки
+        processingThread = new Thread(() -> {
+            try {
+                parseVacancies(temporaryFile.getAbsolutePath(), null, true);
+            }
+            finally {
+                temporaryFile.delete();
+            }
+        });
+        processingThread.start();
     }
 
 }

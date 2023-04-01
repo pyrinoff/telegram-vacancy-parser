@@ -102,14 +102,14 @@ public class PropertyService {
     private @Nullable Integer salaryBordersNonPreciseUsdMax;
 
     @Value("#{environment['user.login']}")
-    private @NotNull String userLogin;
+    private @NotNull String userLogin = "admin";
 
     @Value("#{environment['user.password']}")
-    private @NotNull String userPassword;
+    private @NotNull String userPassword = "admin";
 
     @PostConstruct
     void setStaticVariables() {
-        //думаю, это лучше, чем делать ParserServiceResult - бином (выше нагрузка), или же юзать кастомный Property-лоадер
+        //думаю, это лучше, чем делать ParserServiceResult - бином (выше нагрузка на пересоздание), или же юзать кастомный Property-лоадер
         if(similarityPercent!=null) ParserServiceResult.SIMILARITY_PERCENT = similarityPercent;
         if(salaryBordersPreciseRubMin!=null) AbstractSalaryParser.BORDER_PRECISE_RUB_MIN = salaryBordersPreciseRubMin;
         if(salaryBordersPreciseRubMax!=null) AbstractSalaryParser.BORDER_PRECISE_RUB_MAX = salaryBordersPreciseRubMax;
