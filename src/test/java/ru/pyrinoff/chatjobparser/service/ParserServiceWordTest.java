@@ -33,4 +33,32 @@ public final class ParserServiceWordTest extends AbstractSpringTest {
         Assertions.assertArrayEquals(new String[]{"java"}, parserServiceResult.getWords().toArray());
     }
 
+    @Test
+    public void parseWord2() {
+        @NotNull String text = " fdsfds ui fdff ffd ";
+        @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
+        parserServiceResult.setText(cleanupText(text));
+        parserService.parseWords(parserServiceResult);
+        Assertions.assertArrayEquals(new String[]{"ui"}, parserServiceResult.getWords().toArray());
+    }
+
+    /* TODO POSSIBLE FIX */
+    @Test
+    public void parseWord3() {
+        @NotNull String text = " fdsfds ui-тест fdff ffd ";
+        @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
+        parserServiceResult.setText(cleanupText(text));
+        parserService.parseWords(parserServiceResult);
+        Assertions.assertEquals(0, parserServiceResult.getWords().size());
+    }
+
+    @Test
+    public void parseWord4() {
+        @NotNull String text = " fdsfds javaui fdff ffd ";
+        @NotNull final ParserServiceResult parserServiceResult = new ParserServiceResult();
+        parserServiceResult.setText(cleanupText(text));
+        parserService.parseWords(parserServiceResult);
+        Assertions.assertEquals(0, parserServiceResult.getWords().size());
+    }
+
 }

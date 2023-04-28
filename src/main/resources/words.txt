@@ -79,3 +79,4 @@ codeception
 lead
 manual
 ручное
+ui
