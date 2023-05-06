@@ -57,10 +57,16 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom  {
         }
         if(!fromBorder) hql += " AND v.salaryTo is null";
         if(!toBorder) hql += " AND v.salaryFrom is null";
-        if(!bothBorders) hql += " AND (v.salaryfrom is not null and v.salaryto is not null)";
+        if(!bothBorders) hql += " AND (v.salaryFrom is not null and v.salaryto is not null)";
         if(!allowPredicted) hql += " AND v.withprediction=false";
-        if(salaryFrom !=null) hql += " AND salary >= :salaryFrom";
-        if(salaryTo !=null) hql += " AND salary <= :salaryTo";
+        if(salaryFrom !=null) {
+            if(bothBorders) hql += " AND salaryFrom >= :salaryFrom";
+            else hql += " AND salaryCalc >= :salaryFrom";
+        }
+        if(salaryTo !=null) {
+            if(bothBorders) hql += " AND salaryTo <= :salaryTo";
+            else hql += " AND salaryCalc <= :salaryTo";
+        }
         hql +=  " GROUP BY salaryCalc";
         hql += " ORDER BY salaryCalc ASC";
 
@@ -136,8 +142,14 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom  {
         if(!toBorder) hql += " AND v.salaryFrom is null";
         if(!bothBorders) hql += " AND (v.salaryfrom is not null and v.salaryto is not null)";
         if(!allowPredicted) hql += " AND v.withprediction=false";
-        if(salaryFrom !=null) hql += " AND salary >= :salaryFrom";
-        if(salaryTo !=null) hql += " AND salary <= :salaryTo";
+        if(salaryFrom !=null) {
+            if(bothBorders) hql += " AND salaryFrom >= :salaryFrom";
+            else hql += " AND salaryCalc >= :salaryFrom";
+        }
+        if(salaryTo !=null) {
+            if(bothBorders) hql += " AND salaryTo <= :salaryTo";
+            else hql += " AND salaryCalc <= :salaryTo";
+        }
         hql +=  " GROUP BY DateTrunc";
         hql += " ORDER BY DateTrunc ASC";
 
