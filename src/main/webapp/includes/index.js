@@ -3,6 +3,12 @@ var gChartSalaryOptions = {
     title: 'График количества вакансий к зарплате',
     curveType: 'function',
     legend: {position: 'bottom'},
+    animation: {
+        // startup: true,
+        easing: 'in',
+        duration: 2000
+    },
+    pointSize: 4
     //colors: ['red', 'blue', 'orange']
 };
 var gSalaryCountChart;
@@ -14,7 +20,13 @@ var gChartPeriodOptions = {
     //hAxis: {title: 'Даты'},
     seriesType: 'bars',
     series: {5: {type: 'line'}},
-    legend: {position: 'bottom'}
+    legend: {position: 'bottom'},
+    animation: {
+        // startup: true,
+        easing: 'in',
+        duration: 2000
+    },
+    pointSize: 5
 };
 var gTimePeriodChart;
 
