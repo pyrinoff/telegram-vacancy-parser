@@ -6,27 +6,38 @@
 1. График количества вакансий к размеру зарплаты.
 2. График количества вакансий к временному периоду (месяцы / недели).
 
-__Цель проекта__: предоставить пользователям приблизительные данные о уровне зарплаты и количестве вакансий в сфере QA.
+__Цели проекта__: предоставить пользователям приблизительные данные о уровне зарплаты и количестве вакансий в сфере QA.
 
 Проект развернут: http://pyrinoff.ru/jobstat/
 
+Дата запуска: 5 марта 2023 г.
+
 ## О РАЗРАБОТЧИКЕ
 
-Имя: Андрей Пыринов
-
-E-mail: pyrinoff@gmail.com
+* Имя: Андрей Пыринов
+* E-mail: pyrinoff@gmail.com
 
 ## SOFTWARE / HARDWARE
 
-* JDK: 17.0.2
+* JDK: 17.0.2  
+  * Spring (WebMVC, Security, Data JPA)
+  * Hibernate ORM
+  * JSP
+  * Lombok, JUnit
+  * Gradle
 * Tomcat: 9.0
+* Gitlab CI/CD
+* PostgreSQL
+* Docker-compose
+
+### Рекомендуемые параметры VPS:
 * RAM: 2Gb+
 * HDD: 3Gb+
 
 ## СБОРКА
 
 ```bash
-mvn clean install
+./gradlew clean build
 ```
 
 ## ЗАПУСК
@@ -35,7 +46,7 @@ mvn clean install
 
 ## VPS
 
-Пример скриптов для развертывания на VPS (из вашего gitlab registry container) приведен в папке /upload, основной скрипт - __setup_all.sh__.
+Простой пример скриптов для развертывания на VPS (из вашего gitlab registry container) приведен в папке /upload, основной скрипт - __setup_all.sh__.
 
 ## ЗАГРУЗКА ДАННЫХ
 

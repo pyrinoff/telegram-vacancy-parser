@@ -1,4 +1,4 @@
-package ru.pyrinoff.chatjobparser.service;
+package ru.pyrinoff.chatjobparser.unit.service;
 
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -7,9 +7,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
+import ru.pyrinoff.chatjobparser.unit.common.AbstractSpringTest;
 import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
 import ru.pyrinoff.chatjobparser.configuration.WebMvcConfiguration;
+import ru.pyrinoff.chatjobparser.service.VacancyService;
 import ru.pyrinoff.chatjobparser.service.charts.SalaryCountChartService;
 
 import java.util.ArrayList;

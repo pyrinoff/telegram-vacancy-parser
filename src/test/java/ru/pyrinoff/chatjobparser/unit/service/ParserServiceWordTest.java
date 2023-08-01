@@ -1,11 +1,12 @@
-package ru.pyrinoff.chatjobparser.service;
+package ru.pyrinoff.chatjobparser.unit.service;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.pyrinoff.chatjobparser.common.AbstractSpringTest;
+import ru.pyrinoff.chatjobparser.unit.common.AbstractSpringTest;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.component.parser.salary.AbstractSalaryParser;
+import ru.pyrinoff.chatjobparser.service.ParserService;
 
 import static ru.pyrinoff.chatjobparser.service.ParserService.cleanupText;
 

@@ -13,15 +13,16 @@ stages:
   - publish
 
 build:
-  #https://hub.docker.com/_/maven/tags
-  image: maven:3.8.5-openjdk-17
+  # https://hub.docker.com/_/gradle/tags
+  image: gradle:7.2-jdk17
   stage: build
   script:
-    - mvn clean install
+    - chmod +x ./gradlew
+    - ./gradlew clean build
   artifacts:
     when: always
     paths:
-      - target/jobstat.war
+      - build/libs/chatjobparser.war
   only:
     - master
 

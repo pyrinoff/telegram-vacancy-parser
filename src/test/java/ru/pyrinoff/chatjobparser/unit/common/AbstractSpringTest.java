@@ -1,4 +1,4 @@
-package ru.pyrinoff.chatjobparser.common;
+package ru.pyrinoff.chatjobparser.unit.common;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,7 +29,6 @@ public class AbstractSpringTest {
 
     @AfterAll
     public static void tearDown() {
-//        System.out.println("Spring context closed...");
     }
 
 }
