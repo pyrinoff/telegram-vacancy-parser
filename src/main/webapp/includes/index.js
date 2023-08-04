@@ -498,6 +498,26 @@ function checkStartDate(date, index) {
     }
 }
 
+function findMedian(salaryCounts) {
+    // Step 1: Flatten the salaryCounts array to create an array of salaries
+    const salaries = salaryCounts.flatMap(([salary, count]) => Array(count).fill(salary));
+
+    // Step 2: Sort the salaries in ascending order
+    salaries.sort((a, b) => a - b);
+
+    // Step 3: Find the middle index of the sorted salaries array
+    const middleIndex = Math.floor(salaries.length / 2);
+
+    // Step 4: Check if the number of salaries is even or odd
+    if (salaries.length % 2 === 0) {
+        // If even, take the average of the two middle elements
+        return (salaries[middleIndex - 1] + salaries[middleIndex]) / 2;
+    } else {
+        // If odd, return the middle element
+        return salaries[middleIndex];
+    }
+}
+
 function calculateLinesInfo(response) {
     var dataset = response.salaryCountChart;
     var currency = response.request.salaryCurrency;
@@ -518,38 +538,38 @@ function calculateLinesInfo(response) {
         var dateFrom = null;
         var dateTo = null;
         var midSalary = 0;
+        var medianSalary = 0;
+        var rowSalaryAndCount = new Array();
 
         for (j = 1; j < rowCount; j++) {
             var countOfVacanciesInRow = dataset[j][i];
             if (countOfVacanciesInRow === 0) continue;
             vacancyCount += countOfVacanciesInRow;
             var vacancySalary = dataset[j][0];
+            rowSalaryAndCount.push([vacancySalary, countOfVacanciesInRow]);
             sum += vacancySalary * countOfVacanciesInRow;
             maxSalary = vacancySalary > maxSalary ? vacancySalary : maxSalary;
             minSalary = vacancySalary < minSalary || minSalary == null ? vacancySalary : minSalary;
         }
         if (sum === 0) continue; //null lines
         midSalary = Math.round(sum / vacancyCount / roundMultiplier) * roundMultiplier;
+        medianSalary = findMedian(rowSalaryAndCount);
 
         //additional info
         dateFrom = response.request.lines[i - 1].periodFrom;
         dateTo = response.request.lines[i - 1].periodTo;
         const dateDiff = monthsAndDaysBetweenRemain(dateFrom, dateTo);
         content +=
-            '<li>Линия '
-            + i
+            '<li>Линия ' + i
             + ' (' + dateFrom + ' - ' + dateTo
-            + (dateDiff.months > 0 ?  ', '+ dateDiff.months + ' мес.' : '')
-            + (dateDiff.days > 0 ?  ', '+ dateDiff.days + ' дн.' : '')
-            +')'
-            + ':  вакансий всего - '
-            + vacancyCount
-            + ' шт, средняя ЗП - '
-            + midSalary
-            + ', минимальная - '
-            + minSalary
-            + ', максимальная - '
-            + maxSalary
+            + (dateDiff.months > 0 ? ', ' + dateDiff.months + ' мес.' : '')
+            + (dateDiff.days > 0 ? ', ' + dateDiff.days + ' дн.' : '')
+            + '): '
+            + 'вакансий всего - ' + vacancyCount + ' шт, '
+            + 'средняя ЗП - ' + midSalary + ', '
+            + 'медиана - ' + medianSalary + ', '
+            + 'минимальная - ' + minSalary + ', '
+            + 'максимальная - ' + maxSalary
             + '</li>';
     }
     content += '</ul>'
@@ -607,16 +627,15 @@ function recalculateInflation(border) {
 
     let coefficient = 1;
 
-    if(yearOne <= 2020) coefficient = coefficient * (1 + inflationRates["2020"] / 100);
-    if(yearOne <= 2021) coefficient = coefficient * (1 + inflationRates["2021"] / 100);
-    if(yearOne <= 2022) coefficient = coefficient * (1 + inflationRates["2022"] / 100);
+    if (yearOne <= 2020) coefficient = coefficient * (1 + inflationRates["2020"] / 100);
+    if (yearOne <= 2021) coefficient = coefficient * (1 + inflationRates["2021"] / 100);
+    if (yearOne <= 2022) coefficient = coefficient * (1 + inflationRates["2022"] / 100);
 
-    if(fromBorder) {
+    if (fromBorder) {
         inflationFieldTwo.value = Math.round(inflationValueOne * coefficient);
         console.log("Will set inflationFieldTwo to: ", inflationValueTwo);
-    }
-    else {
-        inflationFieldOne.value = Math.round(inflationValueTwo / (1+coefficient/100));
+    } else {
+        inflationFieldOne.value = Math.round(inflationValueTwo / (1 + coefficient / 100));
         console.log("Will set inflationFieldOne to: ", inflationFieldOne);
     }
 
@@ -628,7 +647,7 @@ function docReady(fn) {
     // see if DOM is already available
     if (document.readyState === "complete" || document.readyState === "interactive") {
         // call on next available tick
-        setTimeout(fn, 1);
+        setTimeout(fn, 500);
     } else {
         document.addEventListener("DOMContentLoaded", fn);
     }

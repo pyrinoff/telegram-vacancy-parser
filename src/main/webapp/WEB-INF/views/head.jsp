@@ -13,4 +13,5 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <!--<script src="./includes/jquery-3.6.3.min.js"></script>-->
     <script src="./includes/index.js"></script>
+    <link rel="icon" href="./includes/favicon.ico" type="image/x-icon">
 </head>

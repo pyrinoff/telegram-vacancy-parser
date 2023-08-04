@@ -50,6 +50,7 @@ public class WebMvcConfiguration extends WebSecurityConfigurerAdapter implements
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/includes/**").addResourceLocations("/includes/");
+        registry.addResourceHandler("/includes/**").addResourceLocations("/includes/");
     }
 
 
