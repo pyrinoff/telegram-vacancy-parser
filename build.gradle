@@ -13,6 +13,7 @@ description 'Telegram Vacancy Parser'
 ext {
     hibernateVersion = '6.2.5.Final'
     junitVersion = '5.8.2'
+    theMainClass = 'ru.pyrinoff.chatjobparser.Main'
 }
 
 jacoco {
@@ -33,8 +34,15 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+application { mainClassName = theMainClass }
+
 jar {
     archiveFileName = "chatjobparser.jar"
+    manifest {
+        attributes(
+                'Main-Class': theMainClass
+        )
+    }
 }
 
 dependencies {

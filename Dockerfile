@@ -2,13 +2,17 @@
 FROM openjdk:17-jdk-alpine
 
 # Указываем рабочую директорию внутри контейнера
-WORKDIR /app
+WORKDIR /opt
 
 # Открываем порт 8080 для приложения
 EXPOSE 8080
 
-# Копируем jar файл приложения в рабочую директорию
-COPY build/libs/chatjobparser.jar /app/chatjobparser.jar
+# Копируем zip файл приложения в рабочую директорию
+COPY /build/distributions/chatjobparser-1.0-SNAPSHOT.zip /opt/chatjobparser-1.0-SNAPSHOT.zip
+
+# Распаковываем zip файл
+RUN unzip chatjobparser-1.0-SNAPSHOT.zip
 
 # Указываем команду для запуска Spring Boot приложения
-CMD ["java", "-jar", "/app/chatjobparser.jar"]
+CMD ["sh", "/opt/chatjobparser-1.0-SNAPSHOT/bin/chatjobparser"]
+#CMD ["ls", "-ls"]
