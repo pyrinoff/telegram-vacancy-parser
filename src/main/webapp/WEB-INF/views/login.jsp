@@ -6,7 +6,7 @@
     <div class="flex-center position-ref full-height">
         <div class="container  col-md-4">
             <div id="infoBlock"></div>
-            <form class="form-signin" method="post" action="${pageContext.request.contextPath}/auth" method="POST">
+            <form class="form-signin" method="post" action="${pageContext.request.contextPath}/login" method="POST">
                 <h2 class="form-signin-heading">LOGIN PAGE</h2>
                 <label for="username" class="sr-only">Username</label>
                 <input type="text" id="username" name="username" class="form-control" placeholder="Username"

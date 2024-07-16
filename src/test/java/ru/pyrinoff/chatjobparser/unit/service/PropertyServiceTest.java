@@ -1,104 +1,75 @@
 package ru.pyrinoff.chatjobparser.unit.service;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.pyrinoff.chatjobparser.unit.common.AbstractSpringTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.pyrinoff.chatjobparser.service.PropertyService;
+import ru.pyrinoff.chatjobparser.unit.common.AbstractSpringTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
+//@PropertySource("classpath:/application-test.properties")
+@ActiveProfiles("test")
 public final class PropertyServiceTest extends AbstractSpringTest {
 
     @Autowired
-    private @NotNull PropertyService PROPERTY_SERVICE;
+    private PropertyService propertyService;
 
-    @BeforeAll
-    public static void setUp() {
-
+    @Test
+    public void testDatabaseProperties() {
+        assertEquals("jdbc:hsqldb:mem:tm", propertyService.getDatabaseUrl());
+        assertEquals("sa", propertyService.getDatabaseUsername());
+        assertEquals("", propertyService.getDatabasePassword());
+        assertEquals("org.hsqldb.jdbcDriver", propertyService.getDatabaseDriver());
+        assertEquals("org.hibernate.dialect.HSQLDialect", propertyService.getDatabaseDialect());
+        assertEquals("create", propertyService.getDatabaseHbm2ddlAuto());
+        assertEquals("true", propertyService.getDatabaseShowSql());
+        assertEquals("true", propertyService.getDatabaseFormatSql());
+        assertEquals("false", propertyService.getCacheUseSecondLevelCache());
+        assertEquals("false", propertyService.getCacheUseQueryCache());
+        assertEquals("false", propertyService.getCacheUseMinimalPuts());
+        assertEquals("jp", propertyService.getCacheRegionPrefix());
+        assertEquals("hazelcast.xml", propertyService.getCacheProviderConfigurationFile());
+        assertEquals("com.hazelcast.hibernate.HazelcastCacheRegionFactory", propertyService.getCacheRegionFactoryClass());
+        assertEquals("someToken", propertyService.getDatabaseAdminProtectionToken());
+        assertFalse(propertyService.getDatabaseNativeQueriesEnabled());
     }
 
     @Test
-    public void setupOk() {
+    public void testLiquibaseProperties() {
+        assertEquals("src/main/resources/changelog/changelog-master.xml", propertyService.getLiquibaseChangelogFile());
     }
 
     @Test
-    public void getDatabaseUrl() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabaseUrl());
+    public void testDebugProperties() {
+        assertFalse(propertyService.getDebugMemory());
     }
 
     @Test
-    public void getDatabaseUsername() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabaseUsername());
+    public void testSimilarityProperties() {
+        assertEquals(95.0f, propertyService.getSimilarityPercent());
     }
 
     @Test
-    public void getDatabasePassword() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabasePassword());
+    public void testSalaryBordersProperties() {
+        assertEquals(15000, propertyService.getSalaryBordersPreciseRubMin());
+        assertEquals(800000, propertyService.getSalaryBordersPreciseRubMax());
+        assertEquals(15000, propertyService.getSalaryBordersNonPreciseRubMin());
+        assertEquals(450000, propertyService.getSalaryBordersNonPreciseRubMax());
+        assertEquals(300, propertyService.getSalaryBordersPreciseUsdMin());
+        assertEquals(12000, propertyService.getSalaryBordersPreciseUsdMax());
+        assertEquals(1000, propertyService.getSalaryBordersNonPreciseUsdMin());
+        assertEquals(7000, propertyService.getSalaryBordersNonPreciseUsdMax());
     }
 
     @Test
-    public void getDatabaseDriver() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabaseDriver());
-    }
-
-    @Test
-    public void getDatabaseDialect() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabaseDialect());
-    }
-
-    @Test
-    public void getDatabaseHbm2ddlAuto() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabaseHbm2ddlAuto());
-    }
-
-    @Test
-    public void getDatabaseShowSql() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabaseShowSql());
-    }
-
-    @Test
-    public void getDatabaseFormatSql() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabaseFormatSql());
-    }
-
-    @Test
-    public void getCacheUseSecondLevelCache() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getCacheUseSecondLevelCache());
-    }
-
-    @Test
-    public void getCacheUseQueryCache() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getCacheUseQueryCache());
-    }
-
-    @Test
-    public void getCacheUseMinimalPuts() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getCacheUseMinimalPuts());
-    }
-
-    @Test
-    public void getCacheRegionPrefix() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getCacheRegionPrefix());
-    }
-
-    @Test
-    public void getCacheProviderConfigurationFile() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getCacheProviderConfigurationFile());
-    }
-
-    @Test
-    public void getCacheRegionFactoryClass() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getCacheRegionFactoryClass());
-    }
-
-    @Test
-    public void getCacheAdminProtectionToken() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getDatabaseAdminProtectionToken());
-    }
-
-    @Test
-    public void getLiquibaseChangelogFile() {
-        Assertions.assertNotNull(PROPERTY_SERVICE.getLiquibaseChangelogFile());
+    public void testDefaultUserProperties() {
+        assertEquals("admin", propertyService.getUserLogin());
+        assertEquals("admin", propertyService.getUserPassword());
     }
 
 }

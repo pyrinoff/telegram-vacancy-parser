@@ -3,16 +3,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Upload</title>
-    <link href="./includes/index.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="./includes/upload.js"></script>
+    <%@ include file="head.jsp" %>
+    <script src="/static/js/admin.js"></script>
 </head>
+</html>
 <body>
 <div class="container">
     <div class="card border-none">
         <div class="card-body">
-            <form method="POST" action="./upload" enctype="multipart/form-data">
+            <form onsubmit="uploadFile(event)">
+                <td><label for="file">Загрузка JSON-файла:</label></td>
+                <input type="file" id="file" name="file" required />
+                <button type="submit">Upload</button>
+            </form>
+            <%--<form method="POST" action="/admin/parser/upload" enctype="multipart/form-data">
                 <table>
                     <tr>
                         <td><label for="file">Загрузка JSON-файла:</label></td>
@@ -22,7 +26,7 @@
                         <td><input type="submit" value="Отправить в обработку"/></td>
                     </tr>
                 </table>
-            </form>
+            </form>--%>
         </div>
     </div>
     <div class="card border-none">
@@ -32,7 +36,7 @@
         </div>
         <div class="card-body">
             <button class="btn btn-primary" onclick="checkStatus();">Проверить статус обработки</button>
-            <button class="btn btn-primary" onclick="clearAll();">Удалить всё из базы</button>
+            <button class="btn btn-primary" onclick="clear();">Удалить всё из базы</button>
         </div>
         <div class="card-body">
             <button class="btn btn-primary" onclick="switchMaintenance(true);">Включить режим "Ведутся работы"</button>
@@ -41,9 +45,10 @@
     </div>
     <div class="card border-none">
         <div class="card-body">
-            <a href="./">На главную</a>
+            <a href="/">На главную</a>
         </div>
     </div>
 </div>
 </body>
+<%@ include file="metrika.jsp" %>
 </html>

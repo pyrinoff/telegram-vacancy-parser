@@ -1,5 +1,6 @@
 package ru.pyrinoff.chatjobparser.model.dto;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,9 +9,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
-import ru.pyrinoff.chatjobparser.enumerated.dto.TimePeriodEnum;
 
-import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,12 +49,14 @@ public class Vacancy {
     @ElementCollection
     @CollectionTable(name = "vacancy_markers")
     @JoinColumn(foreignKey = @ForeignKey(name = "messageId"))
+    //@CollectionTable(name = "vacancy_markers", joinColumns = @JoinColumn(name = "message_id"))
     protected @NotNull Set<String> markers = new HashSet<>();
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ElementCollection
     @CollectionTable(name = "vacancy_words")
     @JoinColumn(foreignKey = @ForeignKey(name = "messageId"))
+    //@CollectionTable(name = "vacancy_words", joinColumns = @JoinColumn(name = "message_id"))
     protected @NotNull Set<String> words = new HashSet<>();
 
 

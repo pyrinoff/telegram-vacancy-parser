@@ -1,9 +1,9 @@
-package ru.pyrinoff.chatjobparser.controller;
+package ru.pyrinoff.chatjobparser.controller.view;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import ru.pyrinoff.chatjobparser.service.ParserService;
 import ru.pyrinoff.chatjobparser.service.PropertyService;
@@ -12,7 +12,7 @@ import ru.pyrinoff.chatjobparser.service.VacancyService;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Controller
+@RestController
 public class IndexController {
 
     @Autowired
@@ -25,6 +25,8 @@ public class IndexController {
     PropertyService propertyService;
 
     private static final int LINES_COUNT = 3;
+
+    public static boolean UNDER_MAINTENANCE = false;
 
     private static Map<String, String> PERIODS = new LinkedHashMap<>() {{
         put("currentYear", "Текущий год");
@@ -54,16 +56,14 @@ public class IndexController {
         put("december", "Декабрь");
     }};
 
-    public static boolean UNDER_MAINTENANCE = false;
-
-    @GetMapping("/")
-    public ModelAndView index() {
+    //JSP
+    @GetMapping({"/", "/chart"})
+    public ModelAndView chart() {
+        //return new ModelAndView("redirect:/chart");
+        if (UNDER_MAINTENANCE) return new ModelAndView("maintenance");
         @NotNull final ModelAndView modelAndView = new ModelAndView();
-        if (UNDER_MAINTENANCE) {
-            modelAndView.setViewName("maintenance");
-            return modelAndView;
-        }
-        modelAndView.setViewName("index");
+        modelAndView.setViewName("chart");
+        //modelAndView.setViewName("chart");
         modelAndView.addObject("LINES_COUNT", LINES_COUNT);
         modelAndView.addObject("DB_ROWS_COUNT", vacancyService.getDB_ROWS_COUNT());
         modelAndView.addObject("DB_LAST_VACANCY_DATE", vacancyService.getDB_LAST_VACANCY_DATE());
@@ -73,5 +73,22 @@ public class IndexController {
         modelAndView.addObject("PERIODS_MONTHS", PERIODS_MONTHS);
         return modelAndView;
     }
+}
+
+/*//*
+/TML
+    @GetMapping("/chart")
+    public String chart(Model model) {
+        model.addAttribute("LINES_COUNT", LINES_COUNT);
+        model.addAttribute("DB_ROWS_COUNT", vacancyService.getDB_ROWS_COUNT());
+        model.addAttribute("DB_LAST_VACANCY_DATE", vacancyService.getDB_LAST_VACANCY_DATE());
+        model.addAttribute("MARKERS", vacancyService.getMARKERS());
+        model.addAttribute("WORDS", vacancyService.getWORDS());
+        model.addAttribute("PERIODS", PERIODS);
+        model.addAttribute("PERIODS_MONTHS", PERIODS_MONTHS);
+        return "chart";
+    }*//*
+
 
 }
+*/

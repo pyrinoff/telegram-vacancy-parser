@@ -4,11 +4,12 @@
 <%@ include file="head.jsp" %>
 <body>
 <div class="container">
-    <div class="card border-none">
-        <div class="card-body">
-            <h3>Ведутся работы, обновите страницу через 10-15 минут.</h3>
-        </div>
-    </div>
+    <%@ include file="headInfo.jsp" %>
+    <%@ include file="chartLineInfo.jsp" %>
+    <%@ include file="quickCalc.jsp" %>
+    <%@ include file="charts.jsp" %>
+    <%@ include file="lineSettingsStatic.jsp" %>
+    <jsp:include page="lineSettings.jsp"/>
 </div>
 <%@ include file="metrika.jsp" %>
 </body>

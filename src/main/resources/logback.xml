@@ -1,0 +1,44 @@
+<configuration>
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+<!--    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/app-%d{MM-dd-yyyy}-%i.log.gz</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>-->
+
+<!--    <logger name="org.apache" level="debug" additivity="true">
+        <appender-ref ref="STDOUT" />
+    </logger>-->
+
+<!--    <logger name="com.github.pyrinoff.somebot.command.CommandPool" level="debug" additivity="true">
+        <appender-ref ref="STDOUT" />
+    </logger>-->
+
+    <logger name="com.github.pyrinoff.somebot.service.bot.vk.VkBotHandler" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+    <logger name="com.github.pyrinoff.somebot.service.bot.vk.VkBot" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+        <!--<appender-ref ref="ROLLING" />-->
+    </root>
+
+</configuration>

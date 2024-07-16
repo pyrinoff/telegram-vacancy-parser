@@ -2,13 +2,11 @@ package ru.pyrinoff.chatjobparser.component.parser.salary;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserData;
 import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserResult;
 import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
-import ru.pyrinoff.chatjobparser.service.PropertyService;
 import ru.pyrinoff.chatjobparser.util.NumberUtil;
 import ru.pyrinoff.chatjobparser.util.RegexUtils;
 
@@ -37,7 +35,7 @@ public abstract class AbstractSalaryParser {
     public static @NotNull Integer BORDER_PRECISE_RUB_MIN = 15000;
     public static @NotNull Integer BORDER_PRECISE_RUB_MAX = 800000;
     public static @NotNull Integer BORDER_NON_PRECISE_RUB_MIN = 15000;
-    public static @NotNull Integer BORDER_NON_PRECISE_RUB_MAX = 450000;
+    public static @NotNull Integer BORDER_NON_PRECISE_RUB_MAX = 600000;
     public static @NotNull Integer BORDER_PRECISE_USD_MIN = 300;
     public static @NotNull Integer BORDER_PRECISE_USD_MAX = 12000;
     public static @NotNull Integer BORDER_NON_PRECISE_USD_MIN = 1000;

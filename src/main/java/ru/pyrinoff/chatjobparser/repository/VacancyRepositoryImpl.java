@@ -1,5 +1,8 @@
 package ru.pyrinoff.chatjobparser.repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
@@ -7,9 +10,6 @@ import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
 import ru.pyrinoff.chatjobparser.enumerated.dto.SqlOperatorEnum;
 import ru.pyrinoff.chatjobparser.enumerated.dto.TimePeriodEnum;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
@@ -102,6 +102,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom  {
         if(obj instanceof BigInteger) return ((BigInteger)obj).intValue();
         if(obj instanceof BigDecimal) return ((BigDecimal)obj).intValue();
         if(obj instanceof Integer) return (Integer) obj;
+        if(obj instanceof Long) return ((Long) obj).intValue();
         throw new IllegalArgumentException("Cant get integer from this object!");
     }
 

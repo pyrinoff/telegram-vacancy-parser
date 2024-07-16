@@ -1,6 +1,6 @@
 function checkStatus() {
     setInfoText('Запустили проверку статуса...');
-    fetch('./api/parse/status', {
+    fetch('/admin/parser/status', {
         method: 'GET'
         //headers: {'Content-Type': 'application/json'},
         //body: JSON.stringify(requestData)
@@ -15,9 +15,9 @@ function checkStatus() {
         });
 }
 
-function clearAll() {
+function clear() {
     setInfoText('Запустили удаление всех записей из БД');
-    fetch('./api/parse/clearAll', {
+    fetch('/admin/parser/clear', {
         method: 'GET',
         //headers: {'Content-Type': 'application/json'},
         //body: JSON.stringify(requestData)
@@ -39,13 +39,35 @@ function switchMaintenance(boolNewStatus) {
     var requestData = {
         enabled: boolNewStatus
     };
-    fetch('./api/maintenance', {
+    fetch('/admin/maintenance', {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(requestData)
     }).then(response => {
         setInfoText((response.status === 200) ? 'Успешно!' : 'Произошла какая-то ошибка, код: ' + response.status);
     });
+}
+
+async function uploadFile(event) {
+    event.preventDefault();
+
+    const fileInput = document.getElementById('file');
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    try {
+        const response = await fetch('/admin/parser/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+        setInfoText(result.message);
+        // document.getElementById('message').innerText = result.message;
+    } catch (error) {
+        setInfoText(error.message);
+        // document.getElementById('message').innerText = 'Ошибка: ' + error.message;
+    }
 }
 
 function onReady() {

@@ -14,7 +14,7 @@ stages:
 
 build:
   # https://hub.docker.com/_/gradle/tags
-  image: gradle:7.2-jdk17
+  image: gradle:8.1-jdk17
   stage: build
   script:
     - chmod +x ./gradlew
@@ -22,7 +22,7 @@ build:
   artifacts:
     when: always
     paths:
-      - build/libs/chatjobparser.war
+      - build/libs/chatjobparser.jar
   only:
     - master
 

@@ -1,5 +1,6 @@
 package ru.pyrinoff.chatjobparser.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Service;
 import ru.pyrinoff.chatjobparser.component.parser.salary.AbstractSalaryParser;
 import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 
-import javax.annotation.PostConstruct;
 
 @Getter
 @Service
@@ -66,9 +66,6 @@ public class PropertyService {
 
     @Value("#{environment['liquibase.outputChangeLogFile']}")
     private @NotNull String liquibaseChangelogFile;
-
-    @Value("#{environment['upload.max_file_size_mb']}")
-    private @NotNull Integer uploadMaxSize;
 
     @Value("#{environment['debug.memory']}")
     private @Nullable Boolean debugMemory;

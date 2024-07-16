@@ -1,5 +1,6 @@
 package ru.pyrinoff.chatjobparser.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,9 @@ import ru.pyrinoff.chatjobparser.repository.VacancyRepository;
 import ru.pyrinoff.chatjobparser.service.charts.PeriodCountChartService;
 import ru.pyrinoff.chatjobparser.service.charts.SalaryCountChartService;
 
-import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.TreeSet;
 
 @Service
 @Scope(BeanDefinition.SCOPE_SINGLETON)

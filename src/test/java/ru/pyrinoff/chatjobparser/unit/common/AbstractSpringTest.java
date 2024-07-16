@@ -5,18 +5,18 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
-import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
-import ru.pyrinoff.chatjobparser.configuration.WebMvcConfiguration;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 //@TestPropertySource(properties = "spring.jpa.properties.hibernate.query.native=false")
+//@ExtendWith(SpringExtension.class)
+//@WebAppConfiguration
+//@ContextConfiguration(classes = {SpringApplicationConfiguraion.class})
+@SpringBootTest
 @ExtendWith(SpringExtension.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = {ApplicationConfiguration.class, WebMvcConfiguration.class})
+//@AutoConfigureMockMvc
 public class AbstractSpringTest {
 
     @BeforeTestClass

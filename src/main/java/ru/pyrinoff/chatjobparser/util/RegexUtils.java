@@ -87,4 +87,9 @@ public interface RegexUtils {
         return true;
     }
 
+    static boolean hasAtLeastOneMatch(String contents, String regex) {
+        List<List<String>> founds = getFound(contents, regex, 1);
+        return founds != null && founds.size() >= 1;
+    }
+
 }

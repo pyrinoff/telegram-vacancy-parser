@@ -12,6 +12,4 @@ public abstract class AbstractMarkerParser {
 
     abstract public @Nullable String getMarker(@NotNull final ParserServiceResult parserServiceResult);
 
-
-
 }

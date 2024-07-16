@@ -6,19 +6,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import ru.pyrinoff.chatjobparser.unit.common.AbstractSpringTest;
-import ru.pyrinoff.chatjobparser.configuration.ApplicationConfiguration;
-import ru.pyrinoff.chatjobparser.configuration.WebMvcConfiguration;
 import ru.pyrinoff.chatjobparser.service.VacancyService;
 import ru.pyrinoff.chatjobparser.service.charts.SalaryCountChartService;
+import ru.pyrinoff.chatjobparser.unit.common.AbstractSpringTest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ContextConfiguration(classes = { ApplicationConfiguration.class, WebMvcConfiguration.class })
+//@ContextConfiguration(classes = { ApplicationConfiguration.class, WebMvcConfiguration.class })
 public class VacancyServiceTest extends AbstractSpringTest {
 
     @Autowired

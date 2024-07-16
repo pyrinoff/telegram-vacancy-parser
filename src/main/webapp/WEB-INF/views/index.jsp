@@ -3,14 +3,6 @@
 <html>
 <%@ include file="head.jsp" %>
 <body>
-<div class="container">
-    <%@ include file="headInfo.jsp" %>
-    <%@ include file="chartLineInfo.jsp" %>
-    <%@ include file="quickCalc.jsp" %>
-    <%@ include file="charts.jsp" %>
-    <%@ include file="lineSettingsStatic.jsp" %>
-    <jsp:include page="lineSettings.jsp"/>
-</div>
-<%@ include file="metrika.jsp" %>
+HELLO WORLD
 </body>
 </html>

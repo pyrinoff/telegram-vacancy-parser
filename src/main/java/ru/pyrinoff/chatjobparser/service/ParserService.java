@@ -1,5 +1,6 @@
 package ru.pyrinoff.chatjobparser.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
+import ru.pyrinoff.chatjobparser.component.parser.marker.AbstractMarkerParser;
+import ru.pyrinoff.chatjobparser.component.parser.salary.AbstractSalaryParser;
+import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserResult;
+import ru.pyrinoff.chatjobparser.component.parser.word.WordParser;
 import ru.pyrinoff.chatjobparser.enumerated.dto.CurrencyEnum;
 import ru.pyrinoff.chatjobparser.enumerated.telegram.TextTypeEnum;
 import ru.pyrinoff.chatjobparser.exception.service.parser.MessageDateEmpty;
@@ -20,15 +25,10 @@ import ru.pyrinoff.chatjobparser.model.parser.ParserServiceResult;
 import ru.pyrinoff.chatjobparser.model.telegram.ChatExportJson;
 import ru.pyrinoff.chatjobparser.model.telegram.Message;
 import ru.pyrinoff.chatjobparser.model.telegram.TextEntity;
-import ru.pyrinoff.chatjobparser.component.parser.marker.AbstractMarkerParser;
-import ru.pyrinoff.chatjobparser.component.parser.salary.AbstractSalaryParser;
-import ru.pyrinoff.chatjobparser.component.parser.salary.result.SalaryParserResult;
-import ru.pyrinoff.chatjobparser.component.parser.word.WordParser;
 import ru.pyrinoff.chatjobparser.util.FileUtils;
 import ru.pyrinoff.chatjobparser.util.JsonUtil;
 import ru.pyrinoff.chatjobparser.util.NumberUtil;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;

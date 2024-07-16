@@ -1,10 +1,10 @@
-version: '3'
+version: '3.9'
 
 services:
 
   #DATABASES
   postgres:
-    image: postgres
+    image: postgres:15
     container_name: postgres
     volumes:
       - ./postgres:/var/lib/postgresql/data
@@ -14,11 +14,13 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    cpus: 1.0
+    mem_limit: 1000m
 
   tomcat:
     image: registry.gitlab.com/pyrinoff/telegram-vacancy-parser/telegram-vacancy-parser:latest
-    container_name: tomcat
-    hostname: tomcat
+    container_name: springboot
+    hostname: springboot
     env_file:
       - .env
     environment:
@@ -32,6 +34,8 @@ services:
       - ${PORT_OUT_APP}:8080
     depends_on:
       - postgres
+    cpus: 1.0
+    mem_limit: 3000m
 
   ouroboros:
     image: pyouroboros/ouroboros
