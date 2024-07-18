@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -68,7 +69,7 @@ public class ParserService {
 
     @SneakyThrows
     public ParserService() {
-        wordsToSearch = new HashSet<>(FileUtils.fileGetContent(ResourceUtils.getFile("classpath:words.txt")));
+        wordsToSearch = new HashSet<>(FileUtils.fileGetContentFromJar("words.txt"));
     }
 
     public static @Nullable String cleanupText(@Nullable String dirtyString) {

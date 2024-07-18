@@ -2,12 +2,13 @@ package ru.pyrinoff.chatjobparser.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface FileUtils {
@@ -24,8 +25,21 @@ public interface FileUtils {
         if (!Files.exists(path)) throw new FileNotFoundException("File not found!");
         return Files.readAllLines(path);
     }
+
+    static @Nullable List<String> fileGetContentFromJar(@Nullable String filename) throws IOException {
+        if (filename == null) throw new RuntimeException("Filename is null!");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new ClassPathResource(filename)
+                .getInputStream(),
+                StandardCharsets.UTF_8));
+        List<String> words = new ArrayList<>();
+        String line;
+        while ((line = reader.readLine()) != null) words.add(line);
+        reader.close();
+        return words;
+    }
+
     static @Nullable List<String> fileGetContent(@Nullable File file) throws IOException {
-        if(file == null) throw new RuntimeException("File null!");
+        if (file == null) throw new RuntimeException("File null!");
         if (!file.exists()) throw new FileNotFoundException("File not found!");
         return Files.readAllLines(file.toPath());
     }
@@ -37,7 +51,7 @@ public interface FileUtils {
         return Files.readString(path);
     }
 
-     static @Nullable String getFilenameFromPath(@Nullable final String filepath) {
+    static @Nullable String getFilenameFromPath(@Nullable final String filepath) {
         if (filepath == null) return null;
         @NotNull final Path path = Path.of(filepath);
         return path.getFileName().toString();
