@@ -22,7 +22,7 @@ build:
   artifacts:
     when: always
     paths:
-      - build/distributions/chatjobparser-1.0-SNAPSHOT.zip
+      - build/distributions/chatjobparser-boot-1.0-SNAPSHOT.zip
   only:
     - master
 

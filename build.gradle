@@ -6,6 +6,9 @@ plugins {
     id 'jacoco'
 }
 
+apply plugin: 'war'
+apply plugin: 'io.spring.dependency-management'
+
 group 'ru.pyrinoff'
 version '1.0-SNAPSHOT'
 description 'Telegram Vacancy Parser'
@@ -43,7 +46,25 @@ jar {
                 'Main-Class': theMainClass
         )
     }
+    /*from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar*/
 }
+
+/*bootJar {
+    archiveFileName = "chatjobparser.jar"
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}*/
+
+/*processResources {
+    from('src/main/webapp') {
+        into('')
+    }
+}*/
 
 dependencies {
     implementation 'org.jetbrains:annotations:23.0.0'

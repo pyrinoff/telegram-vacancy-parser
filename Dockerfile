@@ -8,11 +8,11 @@ WORKDIR /opt
 EXPOSE 8080
 
 # Копируем zip файл приложения в рабочую директорию
-COPY /build/distributions/chatjobparser-1.0-SNAPSHOT.zip /opt/chatjobparser-1.0-SNAPSHOT.zip
+COPY /build/distributions/chatjobparser-boot-1.0-SNAPSHOT.zip /opt/chatjobparser-boot-1.0-SNAPSHOT.zip
 
 # Распаковываем zip файл
-RUN unzip chatjobparser-1.0-SNAPSHOT.zip
+RUN unzip chatjobparser-boot-1.0-SNAPSHOT.zip
 
 # Указываем команду для запуска Spring Boot приложения
-CMD ["sh", "/opt/chatjobparser-1.0-SNAPSHOT/bin/chatjobparser"]
+CMD ["sh", "/opt/chatjobparser-boot-1.0-SNAPSHOT/bin/chatjobparser"]
 #CMD ["ls", "-ls"]
